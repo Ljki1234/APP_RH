@@ -1,0 +1,306 @@
+/* ============================================
+   Gestion RH - Design avancé
+   Typographie, ombres, transitions, profondeur
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+    /* Couleurs principales */
+    --hr-red: #c41e3a;
+    --hr-red-hover: #a31930;
+    --hr-cyan: #0dcaf0;
+    --hr-cyan-hover: #0aa2c0;
+    --hr-bg: #f0f2f5;
+    --hr-bg-main: linear-gradient(160deg, #f5f7fa 0%, #e8ecf1 100%);
+    --hr-surface: #ffffff;
+    --hr-text: #1a1d21;
+    --hr-text-muted: #5c6370;
+    --hr-border: rgba(0, 0, 0, 0.06);
+    --hr-border-focus: rgba(13, 202, 240, 0.4);
+    /* Ombres avancées */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-card-hover: 0 12px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04);
+    /* Rayons */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    /* Transitions */
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --transition-fast: 0.15s var(--ease-out);
+    --transition-normal: 0.25s var(--ease-out);
+}
+
+/* Typographie */
+body.dashboard-page,
+.dashboard-page .app-page-content,
+.dashboard-page .dashboard-card,
+.dashboard-page .employes-table {
+    font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+body.dashboard-page {
+    background: var(--hr-bg-main) !important;
+    color: var(--hr-text);
+}
+
+/* Sidebar gauche - design épuré */
+.dashboard-sidebar-left {
+    background: var(--hr-surface) !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.06) !important;
+    border-right: 1px solid var(--hr-border);
+}
+
+.dashboard-logo {
+    background: linear-gradient(135deg, var(--hr-red) 0%, #9e1830 100%) !important;
+    box-shadow: 0 4px 12px rgba(196, 30, 58, 0.35);
+    font-weight: 700 !important;
+    letter-spacing: 0.02em;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.dashboard-logo:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(196, 30, 58, 0.4);
+}
+
+.dashboard-nav a {
+    border-radius: var(--radius-sm) !important;
+    transition: all var(--transition-fast) !important;
+    color: var(--hr-text-muted) !important;
+}
+
+.dashboard-nav a:hover {
+    background: linear-gradient(135deg, #f8f9fa 0%, #eef0f2 100%) !important;
+    color: var(--hr-text) !important;
+    transform: translateX(2px);
+}
+
+.dashboard-nav a.active {
+    background: linear-gradient(135deg, var(--hr-red) 0%, var(--hr-red-hover) 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+}
+
+.dashboard-nav a.dashboard-nav-logout:hover {
+    background: rgba(196, 30, 58, 0.08) !important;
+    color: var(--hr-red) !important;
+}
+
+.dashboard-sidebar-left .profile-avatar {
+    background: linear-gradient(135deg, #e8ecf1 0%, #d1d8e0 100%) !important;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Zone principale */
+.dashboard-main {
+    padding: 28px 36px !important;
+}
+
+.dashboard-layout.no-right-sidebar .dashboard-main {
+    padding: 32px 40px !important;
+}
+
+/* Titres de page */
+.app-page-content .h3,
+.app-page-content h1.h3 {
+    font-weight: 700 !important;
+    letter-spacing: -0.02em;
+    color: var(--hr-text) !important;
+}
+
+/* Cartes tableau de bord */
+.dashboard-card {
+    background: var(--hr-surface) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-card) !important;
+    border: 1px solid var(--hr-border);
+    padding: 24px !important;
+    transition: box-shadow var(--transition-normal), transform var(--transition-normal);
+}
+
+.dashboard-card:hover {
+    box-shadow: var(--shadow-card-hover) !important;
+}
+
+.dashboard-card-title {
+    font-weight: 600 !important;
+    color: var(--hr-text) !important;
+    font-size: 1rem !important;
+}
+
+/* Listes alertes / soldes */
+.alert-list li,
+.solde-list li {
+    padding: 12px 0 !important;
+    border-bottom: 1px solid var(--hr-border) !important;
+    transition: background var(--transition-fast);
+}
+
+.alert-list li:hover,
+.solde-list li:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.alert-badge,
+.solde-badge {
+    border-radius: 24px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 6px rgba(196, 30, 58, 0.25);
+}
+
+.alert-arrow,
+.solde-arrow {
+    transition: transform var(--transition-fast), background var(--transition-fast);
+}
+
+.alert-arrow:hover,
+.solde-arrow:hover {
+    transform: scale(1.08);
+}
+
+/* Tableaux - design avancé */
+.employes-table {
+    border-radius: var(--radius-md) !important;
+    overflow: hidden;
+    box-shadow: var(--shadow-card) !important;
+    border: 1px solid var(--hr-border);
+}
+
+.employes-table thead th {
+    background: linear-gradient(180deg, #f8f9fa 0%, #f0f2f5 100%) !important;
+    font-weight: 600 !important;
+    font-size: 0.8rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--hr-text-muted) !important;
+    padding: 14px 16px !important;
+    border-bottom: 2px solid var(--hr-border) !important;
+}
+
+.employes-table tbody tr {
+    transition: background var(--transition-fast);
+}
+
+.employes-table tbody tr:hover {
+    background: rgba(13, 202, 240, 0.04) !important;
+}
+
+.employes-table tbody td {
+    padding: 14px 16px !important;
+    font-size: 0.9rem;
+    color: var(--hr-text);
+}
+
+/* Barre de recherche / actions */
+.employes-search-bar {
+    margin-bottom: 1.5rem !important;
+}
+
+.employes-search-bar .btn,
+.employes-search-bar .form-control,
+.employes-search-bar .form-select {
+    border-radius: var(--radius-sm) !important;
+    transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.employes-search-bar .form-control:focus,
+.employes-search-bar .form-select:focus {
+    box-shadow: 0 0 0 3px var(--hr-border-focus) !important;
+    border-color: var(--hr-cyan) !important;
+}
+
+/* Boutons - cohérence */
+.dashboard-page .btn {
+    font-weight: 500 !important;
+    border-radius: var(--radius-sm) !important;
+    transition: all var(--transition-fast) !important;
+}
+
+.dashboard-page .btn:hover {
+    transform: translateY(-1px);
+}
+
+.dashboard-page .btn:active {
+    transform: translateY(0);
+}
+
+/* Cartes formulaire (add/edit) */
+.app-page-content .card {
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-card) !important;
+    border: 1px solid var(--hr-border);
+    overflow: hidden;
+}
+
+.app-page-content .card-body {
+    padding: 28px !important;
+}
+
+.app-page-content .form-control,
+.app-page-content .form-select {
+    border-radius: var(--radius-sm) !important;
+    border-color: var(--hr-border);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.app-page-content .form-control:focus,
+.app-page-content .form-select:focus {
+    border-color: var(--hr-cyan);
+    box-shadow: 0 0 0 3px var(--hr-border-focus);
+}
+
+/* Sidebar droite */
+.dashboard-sidebar-right {
+    background: var(--hr-surface) !important;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.06) !important;
+    border-left: 1px solid var(--hr-border);
+}
+
+.right-metrics li {
+    padding: 12px 0 !important;
+    border-bottom: 1px solid var(--hr-border) !important;
+    transition: background var(--transition-fast);
+}
+
+.right-metrics li:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.right-metrics .metric-arrow {
+    transition: transform var(--transition-fast);
+}
+
+.right-metrics li:hover .metric-arrow {
+    transform: translateX(2px);
+}
+
+/* Collaborateurs / avatars */
+.collab-avatar {
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.collab-item:hover .collab-avatar {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+/* Badges statut */
+.app-badge-statut {
+    font-weight: 500 !important;
+    padding: 0.35em 0.65em !important;
+    border-radius: 20px !important;
+    font-size: 0.8rem !important;
+}
+
+/* Alerts succès */
+.alert-success {
+    border-radius: var(--radius-sm) !important;
+    border: none !important;
+    box-shadow: var(--shadow-sm);
+}

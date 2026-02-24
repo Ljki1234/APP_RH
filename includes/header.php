@@ -13,8 +13,8 @@ $currentUser = getCurrentUser();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<body class="app-page">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-hr" style="background: #c41e3a;">
         <div class="container-fluid">
             <a class="navbar-brand" href="index.php">
                 <i class="bi bi-people-fill"></i> Gestion RH
@@ -30,7 +30,7 @@ $currentUser = getCurrentUser();
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="employes.php">
+                        <a class="nav-link <?= (basename($_SERVER['PHP_SELF']) === 'employes.php' ? 'active' : '') ?>" href="employes.php">
                             <i class="bi bi-people"></i> Employés
                         </a>
                     </li>

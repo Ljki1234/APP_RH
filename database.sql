@@ -1,18 +1,29 @@
--- Base de données pour l'application de Gestion RH
+
 CREATE DATABASE IF NOT EXISTS gestion_rh CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE gestion_rh;
 
--- Table des utilisateurs (administrateurs)
+
 CREATE TABLE IF NOT EXISTS utilisateurs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom_utilisateur VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     mot_de_passe VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'rh') DEFAULT 'rh',
+    role ENUM('admin', 'rh', 'it', 'dg') DEFAULT 'rh',
     date_creation DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table des départements
+
+CREATE TABLE IF NOT EXISTS password_reset_codes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    code CHAR(6) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_email_code (email(100), code),
+    INDEX idx_expires (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 CREATE TABLE IF NOT EXISTS departements (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
@@ -20,7 +31,7 @@ CREATE TABLE IF NOT EXISTS departements (
     date_creation DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table des employés
+
 CREATE TABLE IF NOT EXISTS employes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     matricule VARCHAR(20) UNIQUE NOT NULL,
@@ -40,7 +51,7 @@ CREATE TABLE IF NOT EXISTS employes (
     FOREIGN KEY (departement_id) REFERENCES departements(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table des congés
+
 CREATE TABLE IF NOT EXISTS conges (
     id INT AUTO_INCREMENT PRIMARY KEY,
     employe_id INT NOT NULL,
@@ -57,7 +68,7 @@ CREATE TABLE IF NOT EXISTS conges (
     FOREIGN KEY (traite_par) REFERENCES utilisateurs(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table des salaires
+
 CREATE TABLE IF NOT EXISTS salaires (
     id INT AUTO_INCREMENT PRIMARY KEY,
     employe_id INT NOT NULL,
@@ -76,7 +87,7 @@ CREATE TABLE IF NOT EXISTS salaires (
     UNIQUE KEY unique_salaire (employe_id, mois, annee)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table des présences
+
 CREATE TABLE IF NOT EXISTS presences (
     id INT AUTO_INCREMENT PRIMARY KEY,
     employe_id INT NOT NULL,
@@ -90,14 +101,11 @@ CREATE TABLE IF NOT EXISTS presences (
     UNIQUE KEY unique_presence (employe_id, date_presence)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Insertion d'un utilisateur admin par défaut (mot de passe: admin123)
--- Note: Le hash sera généré dynamiquement lors de l'importation
--- Pour créer manuellement: INSERT INTO utilisateurs (nom_utilisateur, email, mot_de_passe, role) VALUES
--- ('admin', 'admin@gestionrh.com', '$2y$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 'admin');
+
 INSERT INTO utilisateurs (nom_utilisateur, email, mot_de_passe, role) VALUES
 ('admin', 'admin@gestionrh.com', '$2y$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 'admin');
 
--- Insertion de quelques départements par défaut
+
 INSERT INTO departements (nom, description) VALUES
 ('Direction Générale', 'Direction générale de l\'entreprise'),
 ('Ressources Humaines', 'Gestion du personnel et des ressources humaines'),

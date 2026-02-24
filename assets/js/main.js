@@ -1,7 +1,7 @@
-// JavaScript pour l'application Gestion RH
+
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-dismiss alerts after 5 seconds
+  
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(function(alert) {
         setTimeout(function() {
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     });
 
-    // Calcul automatique du salaire net dans le formulaire de salaire
+
     const salaireForm = document.getElementById('salaireForm');
     if (salaireForm) {
         const salaireBase = document.getElementById('salaire_base');
@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (montantHeuresSup) montantHeuresSup.addEventListener('input', calculateSalaireNet);
         if (retenues) retenues.addEventListener('input', calculateSalaireNet);
 
-        // Auto-remplir le salaire de base quand on sélectionne un employé
         if (employeSelect) {
             employeSelect.addEventListener('change', function() {
                 const selectedOption = this.options[this.selectedIndex];
@@ -48,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Calcul automatique du nombre de jours dans le formulaire de congé
+
     const congeForm = document.getElementById('congeForm');
     if (congeForm) {
         const dateDebut = congeForm.querySelector('input[name="date_debut"]');
@@ -69,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const diffTime = Math.abs(fin - debut);
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
                     
-                    // Afficher le nombre de jours (optionnel, si vous ajoutez un champ pour l'afficher)
+
                     console.log('Nombre de jours:', diffDays);
                 }
             }
@@ -79,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Confirmation avant suppression
+
     const deleteButtons = document.querySelectorAll('a[href*="action=delete"]');
     deleteButtons.forEach(function(button) {
         if (!button.onclick) {

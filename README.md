@@ -2,49 +2,49 @@
 
 Application complète de gestion des ressources humaines développée en PHP avec MySQL. Cette application permet de gérer efficacement les ressources humaines d'une entreprise avec une interface moderne et intuitive.
 
-## 📋 Résumé des Fonctionnalités
+##  Résumé des Fonctionnalités
 
-### 🔐 Authentification et Sécurité
+###  Authentification et Sécurité
 - Système de connexion sécurisé avec gestion des rôles (Admin, RH)
 - Sessions sécurisées avec protection contre les attaques
 - Hashage des mots de passe avec l'algorithme bcrypt
 - Protection contre les injections SQL et les attaques XSS
 
-### 👥 Gestion des Employés
+###  Gestion des Employés
 - **Ajout d'employés** : Enregistrement complet avec matricule, coordonnées, poste, département
 - **Modification** : Mise à jour des informations personnelles et professionnelles
 - **Suppression** : Gestion du statut (actif, inactif, congé, démission)
 - **Recherche** : Recherche rapide par nom, matricule ou email
 - **Affichage** : Liste complète avec filtres et tri
 
-### 🏢 Gestion des Départements
+###  Gestion des Départements
 - Création et modification des départements
 - Attribution des employés aux départements
 - Comptage automatique du nombre d'employés par département
 - Description détaillée de chaque département
 
-### 📅 Gestion des Congés
+###  Gestion des Congés
 - **Demande de congés** : Formulaire de demande avec différents types (annuel, maladie, maternité, etc.)
 - **Approbation/Refus** : Traitement des demandes par les responsables RH
 - **Suivi** : Statut en temps réel (en attente, approuvé, refusé)
 - **Calcul automatique** : Nombre de jours de congé calculé automatiquement
 - **Filtres** : Affichage par statut (tous, en attente, approuvés, refusés)
 
-### 💰 Gestion des Salaires
+###  Gestion des Salaires
 - **Calcul automatique** : Salaire net calculé automatiquement (base + prime + heures sup - retenues)
 - **Suivi mensuel** : Gestion des salaires par mois et année
 - **Détails** : Primes, heures supplémentaires, retenues
 - **Statut de paiement** : Suivi (en attente, payé, annulé)
 - **Totalisation** : Affichage du total des salaires pour une période donnée
 
-### ⏰ Gestion des Présences
+###  Gestion des Présences
 - **Enregistrement** : Heure d'arrivée et de départ
 - **Calcul automatique** : Heures travaillées calculées automatiquement
 - **Statuts** : Présent, absent, retard, congé
 - **Suivi quotidien** : Affichage par date avec filtres
 - **Remarques** : Notes additionnelles pour chaque présence
 
-### 📊 Tableau de Bord
+###  Tableau de Bord
 - **Statistiques en temps réel** :
   - Nombre d'employés actifs
   - Nombre de départements
@@ -55,13 +55,13 @@ Application complète de gestion des ressources humaines développée en PHP ave
 
 ## Fonctionnalités Détaillées
 
-- ✅ **Authentification** : Système de connexion sécurisé avec gestion des rôles
-- ✅ **Gestion des employés** : CRUD complet (Créer, Lire, Modifier, Supprimer)
-- ✅ **Gestion des départements** : Organisation par départements
-- ✅ **Gestion des congés** : Demande, approbation et suivi des congés
-- ✅ **Gestion des salaires** : Calcul et suivi des salaires mensuels
-- ✅ **Gestion des présences** : Enregistrement et suivi des présences
-- ✅ **Tableau de bord** : Vue d'ensemble avec statistiques
+-  **Authentification** : Système de connexion sécurisé avec gestion des rôles
+-  **Gestion des employés** : CRUD complet (Créer, Lire, Modifier, Supprimer)
+-  **Gestion des départements** : Organisation par départements
+-  **Gestion des congés** : Demande, approbation et suivi des congés
+-  **Gestion des salaires** : Calcul et suivi des salaires mensuels
+-  **Gestion des présences** : Enregistrement et suivi des présences
+-  **Tableau de bord** : Vue d'ensemble avec statistiques
 
 ## Prérequis
 
@@ -70,14 +70,14 @@ Application complète de gestion des ressources humaines développée en PHP ave
 - Serveur web (Apache avec XAMPP recommandé)
 - Extensions PHP : PDO, PDO_MySQL
 
-## 🚀 Guide d'Installation et d'Exécution - Étape par Étape
+##  Guide d'Installation et d'Exécution - Étape par Étape
 
 ### Étape 1 : Vérifier les Prérequis
 
 Avant de commencer, assurez-vous d'avoir installé :
-- ✅ **XAMPP** (ou WAMP/MAMP) avec PHP 7.4+
-- ✅ **MySQL** activé dans XAMPP
-- ✅ **Apache** activé dans XAMPP
+-  **XAMPP** (ou WAMP/MAMP) avec PHP 7.4+
+-  **MySQL** activé dans XAMPP
+-  **Apache** activé dans XAMPP
 
 ### Étape 2 : Démarrer les Services XAMPP
 
@@ -87,12 +87,12 @@ Avant de commencer, assurez-vous d'avoir installé :
 
 2. **Démarrez Apache**
    - Cliquez sur le bouton **"Start"** à côté d'Apache
-   - Attendez que le statut passe au vert ✅
+   - Attendez que le statut passe au vert 
    - Si le port 80 est occupé, modifiez-le dans les paramètres
 
 3. **Démarrez MySQL**
    - Cliquez sur le bouton **"Start"** à côté de MySQL
-   - Attendez que le statut passe au vert ✅
+   - Attendez que le statut passe au vert 
    - Vérifiez qu'il n'y a pas d'erreurs dans les logs
 
 ### Étape 3 : Vérifier que le Projet est au Bon Endroit
@@ -122,7 +122,7 @@ Avant de commencer, assurez-vous d'avoir installé :
    - Cliquez sur **"Choisir un fichier"** ou **"Browse"**
    - Sélectionnez le fichier `database.sql` dans le dossier `C:\xampp\htdocs\Gestion_RH\`
    - Cliquez sur **"Exécuter"** ou **"Go"** en bas de la page
-   - Attendez le message de succès ✅
+   - Attendez le message de succès 
 
 3. **Vérifiez la création**
    - Dans le menu de gauche, vous devriez voir la base `gestion_rh`
@@ -169,11 +169,11 @@ Avant de commencer, assurez-vous d'avoir installé :
 
 ### Étape 6 : Corriger le Mot de Passe Admin (Important !)
 
-⚠️ **Cette étape est essentielle pour pouvoir se connecter !**
+ **Cette étape est essentielle pour pouvoir se connecter !**
 
 1. **Ouvrez votre navigateur**
 2. **Allez sur** : `http://localhost/Gestion_RH/update_admin_password.php`
-3. **Attendez le message de succès** ✅
+3. **Attendez le message de succès** 
 4. Le mot de passe admin sera automatiquement corrigé
 
 **Alternative** : Si le script ne fonctionne pas, exécutez cette requête SQL dans phpMyAdmin :
@@ -196,13 +196,13 @@ WHERE nom_utilisateur = 'admin';
    - **Nom d'utilisateur** : `admin`
    - **Mot de passe** : `admin123`
 
-4. **Vous devriez être redirigé vers le tableau de bord** ✅
+4. **Vous devriez être redirigé vers le tableau de bord** 
 
 ### Étape 8 : Vérifier que Tout Fonctionne
 
 1. **Testez la connexion** :
    - Allez sur : `http://localhost/Gestion_RH/test_connection.php`
-   - Vérifiez que toutes les tables sont présentes ✅
+   - Vérifiez que toutes les tables sont présentes 
 
 2. **Explorez l'application** :
    - Tableau de bord : Statistiques et vue d'ensemble
@@ -230,7 +230,7 @@ WHERE nom_utilisateur = 'admin';
    - Définissez les salaires de base pour chaque employé
    - Les salaires mensuels seront calculés automatiquement
 
-## 🔑 Compte Administrateur par Défaut
+##  Compte Administrateur par Défaut
 
 - **Nom d'utilisateur** : `admin`
 - **Mot de passe** : `admin123`
@@ -266,9 +266,9 @@ Gestion_RH/
 └── README.md              # Ce fichier
 ```
 
-## 📖 Guide d'Utilisation Détaillé
+##  Guide d'Utilisation Détaillé
 
-### 👥 Gestion des Employés
+###  Gestion des Employés
 
 **Ajouter un employé** :
 1. Cliquez sur **"Employés"** dans le menu de navigation
@@ -288,12 +288,12 @@ Gestion_RH/
 4. Cliquez sur **"Enregistrer"**
 
 **Modifier un employé** :
-1. Dans la liste des employés, cliquez sur l'icône **✏️ Modifier**
+1. Dans la liste des employés, cliquez sur l'icône **  Modifier**
 2. Modifiez les informations souhaitées
 3. Cliquez sur **"Enregistrer"**
 
 **Supprimer un employé** :
-1. Cliquez sur l'icône **🗑️ Supprimer** à côté de l'employé
+1. Cliquez sur l'icône ** Supprimer** à côté de l'employé
 2. Confirmez la suppression
 
 **Rechercher un employé** :
@@ -301,7 +301,7 @@ Gestion_RH/
 2. Recherchez par nom, prénom, matricule ou email
 3. Cliquez sur **"Effacer"** pour réinitialiser
 
-### 🏢 Gestion des Départements
+###  Gestion des Départements
 
 **Ajouter un département** :
 1. Cliquez sur **"Départements"** dans le menu
@@ -313,7 +313,7 @@ Gestion_RH/
 
 **Modifier/Supprimer** : Utilisez les boutons d'action dans la liste
 
-### 📅 Gestion des Congés
+###  Gestion des Congés
 
 **Demander un congé** :
 1. Allez dans **"Congés"**
@@ -329,13 +329,13 @@ Gestion_RH/
 
 **Approuver/Refuser un congé** :
 1. Dans la liste des congés, trouvez le congé en attente
-2. Cliquez sur **✅ Approuver** ou **❌ Refuser**
+2. Cliquez sur ** Approuver** ou ** Refuser**
 3. Confirmez l'action
 
 **Filtrer les congés** :
 - Utilisez les boutons de filtre : Tous, En attente, Approuvés, Refusés
 
-### 💰 Gestion des Salaires
+###  Gestion des Salaires
 
 **Ajouter un salaire** :
 1. Accédez à **"Salaires"**
@@ -359,7 +359,7 @@ Gestion_RH/
 3. Cliquez sur **"Filtrer"**
 4. Le total des salaires nets s'affiche automatiquement
 
-### ⏰ Gestion des Présences
+###  Gestion des Présences
 
 **Enregistrer une présence** :
 1. Allez dans **"Présences"**
@@ -379,7 +379,7 @@ Gestion_RH/
 2. Sélectionnez une date pour voir toutes les présences du jour
 3. Les heures travaillées s'affichent automatiquement
 
-### 📊 Tableau de Bord
+###  Tableau de Bord
 
 Le tableau de bord affiche :
 - **Statistiques en temps réel** :
@@ -415,72 +415,72 @@ L'application est modulaire et facilement extensible. Vous pouvez ajouter :
 - Des notifications par email
 - Un système de permissions plus avancé
 
-## 🔧 Dépannage (Résolution des Problèmes)
+##  Dépannage (Résolution des Problèmes)
 
 ### Problème : "Erreur de connexion à la base de données"
 
 **Solutions** :
-1. ✅ Vérifiez que MySQL est démarré dans XAMPP (statut vert)
-2. ✅ Vérifiez que la base de données `gestion_rh` existe dans phpMyAdmin
-3. ✅ Vérifiez les paramètres dans `config/database.php`
-4. ✅ Testez la connexion avec : `http://localhost/Gestion_RH/test_connection.php`
+1.  Vérifiez que MySQL est démarré dans XAMPP (statut vert)
+2.  Vérifiez que la base de données `gestion_rh` existe dans phpMyAdmin
+3.  Vérifiez les paramètres dans `config/database.php`
+4.  Testez la connexion avec : `http://localhost/Gestion_RH/test_connection.php`
 
 ### Problème : "Nom d'utilisateur ou mot de passe incorrect"
 
 **Solutions** :
-1. ✅ Exécutez le script de correction : `http://localhost/Gestion_RH/update_admin_password.php`
-2. ✅ Vérifiez que l'utilisateur `admin` existe dans la table `utilisateurs`
-3. ✅ Réimportez le fichier `database.sql` si nécessaire
+1.  Exécutez le script de correction : `http://localhost/Gestion_RH/update_admin_password.php`
+2.  Vérifiez que l'utilisateur `admin` existe dans la table `utilisateurs`
+3.  Réimportez le fichier `database.sql` si nécessaire
 
 ### Problème : "Page blanche" ou "Erreur 500"
 
 **Solutions** :
-1. ✅ Vérifiez les logs d'erreur PHP dans `C:\xampp\php\logs\php_error_log`
-2. ✅ Activez l'affichage des erreurs dans `php.ini` :
+1.  Vérifiez les logs d'erreur PHP dans `C:\xampp\php\logs\php_error_log`
+2.  Activez l'affichage des erreurs dans `php.ini` :
    ```ini
    display_errors = On
    error_reporting = E_ALL
    ```
-3. ✅ Vérifiez que toutes les extensions PHP sont activées (PDO, PDO_MySQL)
-4. ✅ Vérifiez les permissions des fichiers
+3.  Vérifiez que toutes les extensions PHP sont activées (PDO, PDO_MySQL)
+4.  Vérifiez les permissions des fichiers
 
 ### Problème : "Apache ne démarre pas"
 
 **Solutions** :
-1. ✅ Vérifiez qu'aucun autre serveur web n'utilise le port 80
-2. ✅ Changez le port Apache dans les paramètres XAMPP (ex: 8080)
-3. ✅ Redémarrez XAMPP en tant qu'administrateur
-4. ✅ Vérifiez les logs Apache dans `C:\xampp\apache\logs\error.log`
+1.  Vérifiez qu'aucun autre serveur web n'utilise le port 80
+2.  Changez le port Apache dans les paramètres XAMPP (ex: 8080)
+3.  Redémarrez XAMPP en tant qu'administrateur
+4.  Vérifiez les logs Apache dans `C:\xampp\apache\logs\error.log`
 
 ### Problème : "MySQL ne démarre pas"
 
 **Solutions** :
-1. ✅ Vérifiez qu'aucun autre MySQL n'est en cours d'exécution
-2. ✅ Changez le port MySQL dans les paramètres XAMPP (ex: 3307)
-3. ✅ Redémarrez XAMPP en tant qu'administrateur
-4. ✅ Vérifiez les logs MySQL dans `C:\xampp\mysql\data\mysql_error.log`
+1.  Vérifiez qu'aucun autre MySQL n'est en cours d'exécution
+2.  Changez le port MySQL dans les paramètres XAMPP (ex: 3307)
+3.  Redémarrez XAMPP en tant qu'administrateur
+4.  Vérifiez les logs MySQL dans `C:\xampp\mysql\data\mysql_error.log`
 
 ### Problème : "Les fichiers CSS/JS ne se chargent pas"
 
 **Solutions** :
-1. ✅ Vérifiez que le dossier `assets` existe et contient les fichiers
-2. ✅ Vérifiez les chemins dans les fichiers PHP (doivent être relatifs)
-3. ✅ Videz le cache de votre navigateur (Ctrl + F5)
-4. ✅ Vérifiez la console du navigateur (F12) pour les erreurs
+1.  Vérifiez que le dossier `assets` existe et contient les fichiers
+2.  Vérifiez les chemins dans les fichiers PHP (doivent être relatifs)
+3.  Videz le cache de votre navigateur (Ctrl + F5)
+4.  Vérifiez la console du navigateur (F12) pour les erreurs
 
-## 📞 Support et Aide
+##  Support et Aide
 
 Pour toute question ou problème, vérifiez dans cet ordre :
 
-1. ✅ **Vérifiez les prérequis** : XAMPP installé, services démarrés
-2. ✅ **Vérifiez la base de données** : Tables créées, utilisateur admin présent
-3. ✅ **Vérifiez les logs** : 
+1.  **Vérifiez les prérequis** : XAMPP installé, services démarrés
+2.  **Vérifiez la base de données** : Tables créées, utilisateur admin présent
+3.  **Vérifiez les logs** : 
    - Logs PHP : `C:\xampp\php\logs\php_error_log`
    - Logs Apache : `C:\xampp\apache\logs\error.log`
    - Logs MySQL : `C:\xampp\mysql\data\mysql_error.log`
-4. ✅ **Testez la connexion** : Utilisez `test_connection.php`
-5. ✅ **Vérifiez les extensions PHP** : PDO et PDO_MySQL doivent être activées
-6. ✅ **Vérifiez les permissions** : Les fichiers doivent être lisibles par Apache
+4.  **Testez la connexion** : Utilisez `test_connection.php`
+5.  **Vérifiez les extensions PHP** : PDO et PDO_MySQL doivent être activées
+6.  **Vérifiez les permissions** : Les fichiers doivent être lisibles par Apache
 
 ## Licence
 

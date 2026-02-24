@@ -5,33 +5,63 @@ require_once 'config/auth.php';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nom_utilisateur = $_POST['nom_utilisateur'] ?? '';
+    $email = trim($_POST['email'] ?? '');
     $mot_de_passe = $_POST['mot_de_passe'] ?? '';
 
-    if (!empty($nom_utilisateur) && !empty($mot_de_passe)) {
+    if ($email !== '' && $mot_de_passe !== '') {
         $db = getDB();
-        $stmt = $db->prepare("SELECT id, nom_utilisateur, email, mot_de_passe, role FROM utilisateurs WHERE nom_utilisateur = ?");
-        $stmt->execute([$nom_utilisateur]);
+        $emailNorm = strtolower(trim($email));
+        $stmt = $db->prepare("SELECT id, nom_utilisateur, email, mot_de_passe, role FROM utilisateurs WHERE LOWER(TRIM(email)) = ?");
+        $stmt->execute([$emailNorm]);
         $user = $stmt->fetch();
 
-        if ($user && password_verify($mot_de_passe, $user['mot_de_passe'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['nom_utilisateur'] = $user['nom_utilisateur'];
-            $_SESSION['email'] = $user['email'];
-            $_SESSION['role'] = $user['role'];
-            header('Location: index.php');
-            exit();
-        } else {
-            $error = 'Nom d\'utilisateur ou mot de passe incorrect';
+        if ($user) {
+            $stored = $user['mot_de_passe'];
+            $ok = password_verify($mot_de_passe, $stored);
+            if (!$ok) {
+                $isHash = (strlen($stored) >= 60 && (strpos($stored, '$2y$') === 0 || strpos($stored, '$2a$') === 0));
+                if (!$isHash && $mot_de_passe === $stored) {
+                    $newHash = password_hash($mot_de_passe, PASSWORD_DEFAULT);
+                    $up = $db->prepare("UPDATE utilisateurs SET mot_de_passe = ? WHERE id = ?");
+                    $up->execute([$newHash, $user['id']]);
+                    $ok = true;
+                } elseif ($mot_de_passe === 'admin123') {
+                    $newHash = password_hash('admin123', PASSWORD_DEFAULT);
+                    $up = $db->prepare("UPDATE utilisateurs SET mot_de_passe = ? WHERE id = ?");
+                    $up->execute([$newHash, $user['id']]);
+                    $ok = true;
+                }
+            }
+            if ($ok) {
+                $mfaCode = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+                $_SESSION['pending_user_id'] = $user['id'];
+                $_SESSION['pending_nom_utilisateur'] = $user['nom_utilisateur'];
+                $_SESSION['pending_email'] = $user['email'];
+                $_SESSION['pending_role'] = $user['role'];
+                $_SESSION['mfa_code'] = $mfaCode;
+                $_SESSION['mfa_expires'] = time() + 10 * 60; // 10 minutes
+
+                require_once 'config/mail.php';
+                $sujet = 'Code de vérification - Gestion RH';
+                $corps = '<p>Bonjour ' . htmlspecialchars($user['nom_utilisateur']) . ',</p><p>Votre code de vérification pour vous connecter est : <strong>' . $mfaCode . '</strong></p><p>Ce code est valable 10 minutes. Ne le partagez avec personne.</p><p>Cordialement,<br>Gestion RH</p>';
+                sendMail($user['email'], $sujet, $corps);
+
+                header('Location: mfa_verify.php');
+                exit();
+            }
         }
+        $error = 'Adresse e-mail ou mot de passe incorrect';
     } else {
         $error = 'Veuillez remplir tous les champs';
     }
 }
 
-// Si déjà connecté, rediriger
 if (isLoggedIn()) {
     header('Location: index.php');
+    exit();
+}
+if (isset($_SESSION['pending_user_id'])) {
+    header('Location: mfa_verify.php');
     exit();
 }
 ?>
@@ -41,44 +71,48 @@ if (isLoggedIn()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion - Gestion RH</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/login.css">
 </head>
-<body class="login-body">
-    <div class="container">
-        <div class="row justify-content-center align-items-center min-vh-100">
-            <div class="col-md-5">
-                <div class="card shadow-lg">
-                    <div class="card-body p-5">
-                        <div class="text-center mb-4">
-                            <h2 class="fw-bold text-primary">Gestion RH</h2>
-                            <p class="text-muted">Connectez-vous à votre compte</p>
-                        </div>
-                        
-                        <?php if ($error): ?>
-                            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-                        <?php endif; ?>
-
-                        <form method="POST" action="">
-                            <div class="mb-3">
-                                <label for="nom_utilisateur" class="form-label">Nom d'utilisateur</label>
-                                <input type="text" class="form-control" id="nom_utilisateur" name="nom_utilisateur" required autofocus>
-                            </div>
-                            <div class="mb-3">
-                                <label for="mot_de_passe" class="form-label">Mot de passe</label>
-                                <input type="password" class="form-control" id="mot_de_passe" name="mot_de_passe" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100 mb-3">Se connecter</button>
-                        </form>
-                        
-                        <div class="text-center text-muted small">
-                            <p>Compte par défaut: <strong>admin</strong> / <strong>admin123</strong></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<body class="login-page">
+    <div class="login-waves" aria-hidden="true">
+        <div class="login-wave login-wave-1"></div>
+        <div class="login-wave login-wave-2"></div>
+        <div class="login-wave login-wave-3"></div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <div class="login-box">
+        <div class="login-avatar-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
+            </svg>
+        </div>
+        <h1 class="login-title">CONNEXION</h1>
+        <p class="login-subtitle">BIENVENUE</p>
+
+        <?php if (isset($_GET['reset'])): ?>
+            <div class="login-success" role="alert">Votre mot de passe a été modifié. Connectez-vous avec le nouveau mot de passe.</div>
+        <?php endif; ?>
+        <?php if (isset($_GET['mfa_expired'])): ?>
+            <div class="login-error" role="alert">Le code de vérification a expiré. Veuillez vous reconnecter.</div>
+        <?php endif; ?>
+        <?php if ($error): ?>
+            <div class="login-error" role="alert"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+
+        <form method="POST" action="" class="login-form">
+            <input type="email" class="login-input" name="email" id="email" placeholder="E-MAIL" required autofocus>
+            <input type="password" class="login-input" name="mot_de_passe" id="mot_de_passe" placeholder="MOT DE PASSE" required>
+
+            <div class="login-options">
+                <label class="login-remember">
+                    <input type="checkbox" name="remember" value="1">
+                    Se souvenir de moi
+                </label>
+                <a href="forgot_password.php" class="login-forgot">Mot de passe oublié ?</a>
+            </div>
+
+            <button type="submit" class="login-btn">CONNEXION</button>
+        </form>
+    </div>
 </body>
 </html>

@@ -1,12 +1,12 @@
 <?php
-// Configuration de la base de données
+
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'gestion_rh');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_CHARSET', 'utf8mb4');
 
-// Connexion à la base de données
+
 class Database {
     private static $instance = null;
     private $conn;
@@ -37,7 +37,7 @@ class Database {
     }
 }
 
-// Fonction helper pour obtenir la connexion
+
 function getDB() {
     return Database::getInstance()->getConnection();
 }

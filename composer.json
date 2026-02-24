@@ -1,0 +1,7 @@
+{
+    "name": "gestion-rh/app",
+    "description": "Gestion RH",
+    "require": {
+        "phpmailer/phpmailer": "^6.9"
+    }
+}

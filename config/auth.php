@@ -1,25 +1,35 @@
 <?php
 session_start();
 
-// Vérifier si l'utilisateur est connecté
 function isLoggedIn() {
     return isset($_SESSION['user_id']);
 }
 
-// Vérifier si l'utilisateur est admin
 function isAdmin() {
     return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
 }
 
-// Rediriger vers la page de connexion si non connecté
+/**
+ * Accès total (RH, IT, admin) : peut ajouter, modifier, supprimer.
+ * DG = accès limité (lecture seule).
+ */
+function hasFullAccess() {
+    if (!isset($_SESSION['role'])) return false;
+    return in_array($_SESSION['role'], ['admin', 'rh', 'it'], true);
+}
+
 function requireLogin() {
+    if (isset($_SESSION['pending_user_id']) && !isset($_SESSION['user_id'])) {
+        header('Location: /Gestion_RH/mfa_verify.php');
+        exit();
+    }
     if (!isLoggedIn()) {
         header('Location: /Gestion_RH/login.php');
         exit();
     }
 }
 
-// Obtenir les informations de l'utilisateur connecté
+
 function getCurrentUser() {
     if (!isLoggedIn()) {
         return null;

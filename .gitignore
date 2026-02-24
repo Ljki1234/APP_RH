@@ -1,10 +1,6 @@
 # Fichiers de configuration sensibles
 config/database.php.local
 config/auth.php.local
-config/mail_smtp.php
-
-# Dépendances Composer (réinstaller avec: composer install)
-vendor/
 
 # Fichiers temporaires et de test
 test_connection.php

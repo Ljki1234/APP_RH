@@ -4,7 +4,7 @@ $hideRightSidebar = true;
 require_once 'config/database.php';
 require_once 'config/auth.php';
 requireLogin();
-if (!isAdmin()) {
+if (!canManageUsers()) {
     header('Location: index.php');
     exit();
 }

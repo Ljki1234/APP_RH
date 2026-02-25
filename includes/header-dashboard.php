@@ -27,7 +27,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             <a href="conges.php" class="<?= $currentPage === 'conges.php' ? 'active' : '' ?>" title="Congés"><i class="bi bi-calendar-check"></i></a>
             <a href="salaires.php" class="<?= $currentPage === 'salaires.php' ? 'active' : '' ?>" title="Salaires"><i class="bi bi-cash-coin"></i></a>
             <a href="presences.php" class="<?= $currentPage === 'presences.php' ? 'active' : '' ?>" title="Présences"><i class="bi bi-clock-history"></i></a>
-            <?php if (isAdmin()): ?><a href="utilisateurs.php" class="<?= $currentPage === 'utilisateurs.php' ? 'active' : '' ?>" title="Utilisateurs"><i class="bi bi-person-gear"></i></a><?php endif; ?>
+            <?php if (canManageUsers()): ?><a href="utilisateurs.php" class="<?= $currentPage === 'utilisateurs.php' ? 'active' : '' ?>" title="Utilisateurs"><i class="bi bi-person-gear"></i></a><?php endif; ?>
             <a href="logout.php" class="dashboard-nav-logout" title="Déconnexion"><i class="bi bi-box-arrow-right"></i></a>
         </nav>
         <div class="profile-bottom">

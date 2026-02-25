@@ -9,6 +9,11 @@ function isAdmin() {
     return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
 }
 
+/** Admin et IT peuvent gérer les utilisateurs de l'application (rôles et mots de passe). */
+function canManageUsers() {
+    return isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin', 'it'], true);
+}
+
 /**
  * Accès total (RH, IT, admin) : peut ajouter, modifier, supprimer.
  * DG = accès limité (lecture seule).

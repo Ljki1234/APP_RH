@@ -10,7 +10,7 @@
 
 body.dashboard-page {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: var(--hr-bg);
+    background: #f0f2f5;
     margin: 0;
     min-height: 100vh;
 }
@@ -24,7 +24,7 @@ body.dashboard-page {
     width: var(--hr-sidebar-width);
     min-width: var(--hr-sidebar-width);
     background: #fff;
-    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.06);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -35,75 +35,156 @@ body.dashboard-page {
     background: var(--hr-red);
     color: #fff;
     font-weight: 700;
-    font-size: 0.75rem;
-    padding: 10px 12px;
-    border-radius: 8px;
-    margin-bottom: 32px;
+    font-size: 0.7rem;
+    line-height: 1.2;
+    padding: 12px 14px;
+    border-radius: 12px;
+    margin-bottom: 28px;
+    text-align: center;
+    letter-spacing: 0.02em;
 }
 
 .dashboard-nav {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     flex: 1;
 }
 
 .dashboard-nav a {
     width: 44px;
     height: 44px;
-    border-radius: 10px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6c757d;
+    color: #5c6370;
     text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
-.dashboard-nav a:hover { background: #f0f0f0; color: #333; }
-.dashboard-nav a.active { background: var(--hr-red); color: #fff; }
+.dashboard-nav a:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+.dashboard-nav a.active {
+    background: var(--hr-red);
+    color: #fff;
+    border-radius: 50%;
+}
 .dashboard-nav a.dashboard-nav-logout {
     margin-top: 8px;
     border-top: 1px solid rgba(0,0,0,0.08);
     padding-top: 8px;
 }
-.dashboard-nav a.dashboard-nav-logout:hover { background: rgba(196, 30, 58, 0.1); color: var(--hr-red); }
+.dashboard-nav a.dashboard-nav-logout:hover {
+    background: rgba(196, 30, 58, 0.1);
+    color: var(--hr-red);
+}
 
-.dashboard-sidebar-left .profile-bottom { margin-top: auto; position: relative; }
+.dashboard-sidebar-left .profile-bottom {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding-top: 12px;
+}
 .dashboard-sidebar-left .profile-avatar {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ddd 0%, #bbb 100%);
+    background: #e9ecef;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #666;
+    color: #6c757d;
+    font-size: 1.1rem;
 }
 .dashboard-sidebar-left .profile-badge {
-    position: absolute;
-    bottom: -2px;
-    right: -2px;
-    width: 20px;
-    height: 20px;
-    background: var(--hr-red);
-    color: #fff;
-    font-size: 0.6rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid #fff;
+    color: var(--hr-red);
+    background: none;
+    border: none;
+    position: static;
+    width: auto;
+    height: auto;
 }
 
 .dashboard-main {
     flex: 1;
-    padding: 24px;
+    display: flex;
+    flex-direction: column;
     overflow-x: hidden;
     min-width: 0;
+    padding: 0;
 }
 
-.dashboard-layout.no-right-sidebar .dashboard-main {
+.dashboard-topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    flex-shrink: 0;
+}
+.dashboard-topbar-spacer { flex: 1; }
+.dashboard-topbar-user {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-right: 4px;
+}
+.dashboard-topbar-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #1a1d21;
+    letter-spacing: 0.02em;
+}
+.dashboard-topbar-role {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 2px;
+}
+.dashboard-topbar-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 1rem;
+}
+.dashboard-topbar-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    background: #fff;
+    color: #5c6370;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.dashboard-topbar-btn:hover {
+    background: #f8f9fa;
+    color: #333;
+    border-color: #ced4da;
+}
+.dashboard-main-inner {
+    flex: 1;
+    padding: 24px;
+    overflow-x: hidden;
+}
+
+.dashboard-layout.no-right-sidebar .dashboard-main .dashboard-main-inner {
     padding: 28px 32px;
 }
 
@@ -111,25 +192,26 @@ body.dashboard-page {
     width: var(--hr-right-sidebar-width);
     min-width: var(--hr-right-sidebar-width);
     background: #fff;
-    box-shadow: -2px 0 12px rgba(0, 0, 0, 0.06);
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.06);
     padding: 24px;
     overflow-y: auto;
 }
 
 .right-profile-card { text-align: center; margin-bottom: 24px; }
 .right-profile-avatar {
-    width: 80px;
-    height: 80px;
+    width: 72px;
+    height: 72px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ddd 0%, #bbb 100%);
-    margin: 0 auto 12px;
+    background: #e9ecef;
+    margin: 0 auto 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #666;
+    color: #6c757d;
+    font-size: 1.5rem;
 }
-.right-profile-name { font-weight: 600; color: #333; font-size: 0.95rem; }
-.right-profile-role { font-size: 0.8rem; color: #666; margin-top: 4px; }
+.right-profile-name { font-weight: 700; color: #1a1d21; font-size: 0.95rem; }
+.right-profile-role { font-size: 0.8rem; color: #6c757d; margin-top: 4px; }
 
 .right-metrics { list-style: none; padding: 0; margin: 0 0 24px 0; }
 .right-metrics li {
@@ -168,19 +250,19 @@ body.dashboard-page {
 .timeline-legend .dot { width: 6px; height: 6px; border-radius: 50%; }
 
 /* Cartes tableau de bord */
-.dashboard-cards { display: grid; gap: 20px; max-width: 900px; }
-.dashboard-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.dashboard-cards { display: grid; gap: 24px; max-width: 960px; }
+.dashboard-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 @media (max-width: 900px) { .dashboard-row { grid-template-columns: 1fr; } }
 
 .dashboard-card {
     background: #fff;
     border-radius: 12px;
-    box-shadow: var(--hr-card-shadow);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
     padding: 20px;
-    border: none;
+    border: 1px solid #f0f0f0;
 }
-.dashboard-card-title { font-size: 0.95rem; font-weight: 600; color: #333; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
-.dashboard-card-title .card-meta { font-size: 0.85rem; color: #666; }
+.dashboard-card-title { font-size: 0.95rem; font-weight: 700; color: #1a1d21; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+.dashboard-card-title .card-meta { font-size: 0.85rem; color: #6c757d; }
 
 .alert-list, .solde-list { list-style: none; padding: 0; margin: 0; }
 .alert-list li, .solde-list li {

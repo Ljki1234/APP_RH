@@ -46,4 +46,15 @@ function getCurrentUser() {
         'role' => $_SESSION['role']
     ];
 }
+
+/** Libellé du rôle pour l’affichage (topbar, sidebar droite). */
+function getRoleLabel($role) {
+    $labels = [
+        'dg' => 'Directeur général',
+        'admin' => 'Administrateur',
+        'rh' => 'Gestion des Ressources Humaines',
+        'it' => 'Informatique'
+    ];
+    return $labels[$role] ?? 'Utilisateur';
+}
 ?>

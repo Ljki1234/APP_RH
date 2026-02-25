@@ -48,60 +48,65 @@ body.dashboard-page {
     color: var(--hr-text);
 }
 
-/* Sidebar gauche - design épuré */
+/* Sidebar gauche - style référence : blanc, cercle rouge actif */
 .dashboard-sidebar-left {
-    background: var(--hr-surface) !important;
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.06) !important;
-    border-right: 1px solid var(--hr-border);
+    background: #fff !important;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06) !important;
 }
 
 .dashboard-logo {
-    background: linear-gradient(135deg, var(--hr-red) 0%, #9e1830 100%) !important;
-    box-shadow: 0 4px 12px rgba(196, 30, 58, 0.35);
+    background: var(--hr-red) !important;
+    color: #fff !important;
     font-weight: 700 !important;
     letter-spacing: 0.02em;
-    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.dashboard-logo:hover {
-    transform: scale(1.02);
-    box-shadow: 0 6px 16px rgba(196, 30, 58, 0.4);
 }
 
 .dashboard-nav a {
-    border-radius: var(--radius-sm) !important;
-    transition: all var(--transition-fast) !important;
-    color: var(--hr-text-muted) !important;
+    border-radius: 50% !important;
+    color: #5c6370 !important;
+    transition: background 0.2s ease, color 0.2s ease !important;
 }
 
 .dashboard-nav a:hover {
-    background: linear-gradient(135deg, #f8f9fa 0%, #eef0f2 100%) !important;
-    color: var(--hr-text) !important;
-    transform: translateX(2px);
+    background: #f0f0f0 !important;
+    color: #333 !important;
 }
 
 .dashboard-nav a.active {
-    background: linear-gradient(135deg, var(--hr-red) 0%, var(--hr-red-hover) 100%) !important;
+    background: var(--hr-red) !important;
     color: #fff !important;
-    box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+    border-radius: 50% !important;
 }
 
 .dashboard-nav a.dashboard-nav-logout:hover {
-    background: rgba(196, 30, 58, 0.08) !important;
+    background: rgba(196, 30, 58, 0.1) !important;
     color: var(--hr-red) !important;
 }
 
 .dashboard-sidebar-left .profile-avatar {
-    background: linear-gradient(135deg, #e8ecf1 0%, #d1d8e0 100%) !important;
-    box-shadow: var(--shadow-sm);
+    background: #e9ecef !important;
+    color: #6c757d !important;
+}
+
+/* Topbar - style référence */
+.dashboard-topbar {
+    border-bottom: 1px solid #eee;
+}
+.dashboard-topbar-name {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    letter-spacing: 0.02em;
+}
+.dashboard-topbar-btn:focus-visible {
+    outline: 2px solid var(--hr-red);
+    outline-offset: 2px;
 }
 
 /* Zone principale */
-.dashboard-main {
+.dashboard-main-inner {
     padding: 28px 36px !important;
 }
 
-.dashboard-layout.no-right-sidebar .dashboard-main {
+.dashboard-layout.no-right-sidebar .dashboard-main .dashboard-main-inner {
     padding: 32px 40px !important;
 }
 
@@ -113,18 +118,13 @@ body.dashboard-page {
     color: var(--hr-text) !important;
 }
 
-/* Cartes tableau de bord */
+/* Cartes tableau de bord - style référence */
 .dashboard-card {
-    background: var(--hr-surface) !important;
-    border-radius: var(--radius-lg) !important;
-    box-shadow: var(--shadow-card) !important;
-    border: 1px solid var(--hr-border);
-    padding: 24px !important;
-    transition: box-shadow var(--transition-normal), transform var(--transition-normal);
-}
-
-.dashboard-card:hover {
-    box-shadow: var(--shadow-card-hover) !important;
+    background: #fff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid #f0f0f0 !important;
+    padding: 20px !important;
 }
 
 .dashboard-card-title {

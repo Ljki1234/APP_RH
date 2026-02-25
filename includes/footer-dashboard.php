@@ -8,6 +8,7 @@ $first = isset($parts[1]) ? ucfirst(htmlspecialchars($parts[0])) : '';
 $roleLabels = ['dg' => 'Directeur Général', 'admin' => 'Administrateur', 'rh' => 'Ressources Humaines', 'it' => 'Informatique'];
 $roleLabel = isset($currentUser['role']) && isset($roleLabels[$currentUser['role']]) ? $roleLabels[$currentUser['role']] : 'Directeur gestion des Ressources Humaines';
 ?>
+        </div>
     </main>
     <?php if ($showRightSidebar): ?>
     <aside class="dashboard-sidebar-right">

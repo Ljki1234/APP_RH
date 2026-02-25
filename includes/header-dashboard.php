@@ -32,7 +32,8 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         </nav>
         <div class="profile-bottom">
             <div class="profile-avatar"><i class="bi bi-person-fill"></i></div>
-            <span class="profile-badge"><?= date('y') ?></span>
+            <span class="profile-badge"><?= date('Y') ?></span>
         </div>
     </aside>
     <main class="dashboard-main">
+        <div class="dashboard-main-inner">

@@ -35,11 +35,11 @@ body.dashboard-page {
     background: var(--hr-red);
     color: #fff;
     font-weight: 700;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     line-height: 1.2;
-    padding: 12px 14px;
-    border-radius: 12px;
-    margin-bottom: 28px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    margin-bottom: 24px;
     text-align: center;
     letter-spacing: 0.02em;
 }
@@ -121,6 +121,13 @@ body.dashboard-page {
     padding: 0;
 }
 
+/* Bannière en haut : même fond que le menu (blanc), sans bande rouge */
+.dashboard-banner {
+    height: 32px;
+    flex-shrink: 0;
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+}
 .dashboard-topbar {
     display: flex;
     align-items: center;

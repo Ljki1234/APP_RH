@@ -207,7 +207,7 @@ require_once 'includes/header-dashboard.php';
     </div>
 <?php else: ?>
     <div class="app-page-content">
-        <h1 class="h3 mb-4"><i class="bi bi-people"></i> Employés</h1>
+        <h1 class="h3 mb-4">Employés</h1>
 
         <div class="employes-search-bar mb-3">
             <form method="GET" action="employes.php" class="d-flex gap-2 flex-wrap">

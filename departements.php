@@ -60,10 +60,7 @@ if ($action === 'add' || $action === 'edit') {
     require_once 'includes/header-dashboard.php';
     ?>
     <div class="app-page-content">
-        <h1 class="h3 mb-4">
-            <i class="bi bi-<?= $action === 'add' ? 'plus-circle' : 'pencil' ?>"></i>
-            <?= $action === 'add' ? 'Ajouter un département' : 'Modifier un département' ?>
-        </h1>
+        <h1 class="h3 mb-4"><?= $action === 'add' ? 'Ajouter un département' : 'Modifier un département' ?></h1>
         <div class="card">
             <div class="card-body">
                 <form method="POST" action="">
@@ -101,7 +98,7 @@ require_once 'includes/header-dashboard.php';
 <?php endif; ?>
 
 <div class="app-page-content">
-    <h1 class="h3 mb-4"><i class="bi bi-building"></i> Départements</h1>
+    <h1 class="h3 mb-4">Départements</h1>
 
     <div class="employes-search-bar mb-3">
         <div class="d-flex gap-2 flex-wrap">

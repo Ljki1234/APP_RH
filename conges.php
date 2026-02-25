@@ -101,10 +101,7 @@ if ($action === 'add' || $action === 'edit') {
     require_once 'includes/header-dashboard.php';
     ?>
     <div class="app-page-content">
-        <h1 class="h3 mb-4">
-            <i class="bi bi-<?= $action === 'add' ? 'calendar-plus' : 'pencil' ?>"></i>
-            <?= $action === 'add' ? 'Demander un congé' : 'Modifier un congé' ?>
-        </h1>
+        <h1 class="h3 mb-4"><?= $action === 'add' ? 'Demander un congé' : 'Modifier un congé' ?></h1>
         <div class="card">
             <div class="card-body">
                 <form method="POST" action="">
@@ -181,7 +178,7 @@ require_once 'includes/header-dashboard.php';
 <?php endif; ?>
 
 <div class="app-page-content">
-    <h1 class="h3 mb-4"><i class="bi bi-calendar-check"></i> Congés</h1>
+    <h1 class="h3 mb-4">Congés</h1>
 
     <div class="employes-search-bar mb-3">
         <div class="d-flex flex-wrap gap-2 align-items-center">

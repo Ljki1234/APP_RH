@@ -74,10 +74,7 @@ if ($action === 'add' || $action === 'edit') {
     require_once 'includes/header-dashboard.php';
     ?>
     <div class="app-page-content">
-        <h1 class="h3 mb-4">
-            <i class="bi bi-<?= $action === 'add' ? 'cash-stack' : 'pencil' ?>"></i>
-            <?= $action === 'add' ? 'Ajouter un salaire' : 'Modifier un salaire' ?>
-        </h1>
+        <h1 class="h3 mb-4"><?= $action === 'add' ? 'Ajouter un salaire' : 'Modifier un salaire' ?></h1>
         <div class="card">
             <div class="card-body">
                 <form method="POST" action="" id="salaireForm">
@@ -185,7 +182,7 @@ require_once 'includes/header-dashboard.php';
 <?php endif; ?>
 
 <div class="app-page-content">
-    <h1 class="h3 mb-4"><i class="bi bi-cash-coin"></i> Gestion des Salaires</h1>
+    <h1 class="h3 mb-4">Gestion des Salaires</h1>
 
     <div class="employes-search-bar mb-3">
         <div class="d-flex flex-wrap gap-2 align-items-center">

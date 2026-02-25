@@ -80,10 +80,7 @@ if ($action === 'add' || $action === 'edit') {
     require_once 'includes/header-dashboard.php';
     ?>
     <div class="app-page-content">
-        <h1 class="h3 mb-4">
-            <i class="bi bi-<?= $action === 'add' ? 'person-plus' : 'pencil' ?>"></i>
-            <?= $action === 'add' ? 'Ajouter un utilisateur' : 'Modifier un utilisateur' ?>
-        </h1>
+        <h1 class="h3 mb-4"><?= $action === 'add' ? 'Ajouter un utilisateur' : 'Modifier un utilisateur' ?></h1>
         <?php if (!empty($error)): ?>
             <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
@@ -139,7 +136,7 @@ require_once 'includes/header-dashboard.php';
 <?php endif; ?>
 
 <div class="app-page-content">
-    <h1 class="h3 mb-4"><i class="bi bi-people"></i> Gestion des utilisateurs</h1>
+    <h1 class="h3 mb-4">Gestion des utilisateurs</h1>
 
     <div class="employes-search-bar mb-3">
         <div class="d-flex gap-2 flex-wrap">

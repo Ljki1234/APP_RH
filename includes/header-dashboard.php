@@ -30,10 +30,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             <?php if (canManageUsers()): ?><a href="utilisateurs.php" class="<?= $currentPage === 'utilisateurs.php' ? 'active' : '' ?>" title="Utilisateurs"><i class="bi bi-person-gear"></i></a><?php endif; ?>
             <a href="logout.php" class="dashboard-nav-logout" title="Déconnexion"><i class="bi bi-box-arrow-right"></i></a>
         </nav>
-        <div class="profile-bottom">
-            <div class="profile-avatar"><i class="bi bi-person-fill"></i></div>
-            <span class="profile-badge"><?= date('Y') ?></span>
-        </div>
     </aside>
     <main class="dashboard-main">
+        <div class="dashboard-banner"></div>
         <div class="dashboard-main-inner">

@@ -3,13 +3,40 @@ require_once 'config/database.php';
 require_once 'config/auth.php';
 
 $error = '';
+$db = getDB();
+
+// Tables pour limitation des tentatives et audit
+$db->exec("CREATE TABLE IF NOT EXISTS login_attempts (
+    identifier VARCHAR(128) NOT NULL PRIMARY KEY,
+    attempts INT UNSIGNED NOT NULL DEFAULT 0,
+    locked_until DATETIME NULL,
+    INDEX idx_locked (locked_until)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+$db->exec("CREATE TABLE IF NOT EXISTS login_audit (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    identifier VARCHAR(128) NOT NULL,
+    email_attempted VARCHAR(255) NOT NULL DEFAULT '',
+    event VARCHAR(32) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_identifier (identifier),
+    INDEX idx_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $clientId = getLoginClientIdentifier();
+
+    if (isLoginBlocked($db, $clientId)) {
+        $remaining = getLoginLockoutRemaining($db, $clientId);
+        $minutes = (int) ceil($remaining / 60);
+        $error = 'Trop de tentatives de connexion. Réessayez dans ' . $minutes . ' minute(s).';
+        logLoginAudit($db, $clientId, trim($_POST['email'] ?? ''), 'blocked');
+    } elseif (!csrf_validate()) {
+        $error = 'Session expirée ou formulaire invalide. Veuillez réessayer.';
+    } else {
     $email = trim($_POST['email'] ?? '');
     $mot_de_passe = $_POST['mot_de_passe'] ?? '';
 
     if ($email !== '' && $mot_de_passe !== '') {
-        $db = getDB();
         $emailNorm = strtolower(trim($email));
         $stmt = $db->prepare("SELECT id, nom_utilisateur, email, mot_de_passe, role FROM utilisateurs WHERE LOWER(TRIM(email)) = ?");
         $stmt->execute([$emailNorm]);
@@ -33,6 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             if ($ok) {
+                clearLoginAttempts($db, $clientId);
+                logLoginAudit($db, $clientId, $user['email'], 'success');
+                session_regenerate_id(true);
                 $mfaCode = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
                 $_SESSION['pending_user_id'] = $user['id'];
                 $_SESSION['pending_nom_utilisateur'] = $user['nom_utilisateur'];
@@ -50,9 +80,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit();
             }
         }
+
+        recordFailedLogin($db, $clientId, $email);
+        logLoginAudit($db, $clientId, $email, 'failed');
         $error = 'Adresse e-mail ou mot de passe incorrect';
     } else {
         $error = 'Veuillez remplir tous les champs';
+    }
     }
 }
 
@@ -95,11 +129,15 @@ if (isset($_SESSION['pending_user_id'])) {
         <?php if (isset($_GET['mfa_expired'])): ?>
             <div class="login-error" role="alert">Le code de vérification a expiré. Veuillez vous reconnecter.</div>
         <?php endif; ?>
+        <?php if (isset($_GET['timeout'])): ?>
+            <div class="login-error" role="alert">Session expirée (inactivité). Veuillez vous reconnecter.</div>
+        <?php endif; ?>
         <?php if ($error): ?>
             <div class="login-error" role="alert"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
         <form method="POST" action="" class="login-form">
+            <?= csrf_field() ?>
             <input type="email" class="login-input" name="email" id="email" placeholder="E-MAIL" required autofocus>
             <input type="password" class="login-input" name="mot_de_passe" id="mot_de_passe" placeholder="MOT DE PASSE" required>
 

@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once 'config/database.php';
 require_once 'config/auth.php';
 
@@ -27,6 +26,9 @@ if (isLoggedIn()) {
 
 // Étape 1 : demande de code (envoi par email)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($step === 'request' || isset($_POST['action_request']))) {
+    if (!csrf_validate()) {
+        $error = 'Session expirée ou formulaire invalide. Veuillez réessayer.';
+    } else {
     $email = trim($_POST['email'] ?? '');
     if ($email === '') {
         $error = 'Veuillez entrer votre adresse e-mail.';
@@ -58,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($step === 'request' || isset($_POS
             exit();
         }
     }
+    }
 }
 
 // Étape 2 : saisie du code et nouveau mot de passe
@@ -69,6 +72,9 @@ if ($step === 'reset') {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_reset'])) {
+        if (!csrf_validate()) {
+            $error = 'Session expirée ou formulaire invalide. Veuillez réessayer.';
+        } else {
         $code = preg_replace('/\D/', '', $_POST['code'] ?? '');
         $nouveau = $_POST['nouveau_mot_de_passe'] ?? '';
         $confirme = $_POST['confirme_mot_de_passe'] ?? '';
@@ -94,6 +100,7 @@ if ($step === 'reset') {
                 header('Location: login.php?reset=1');
                 exit();
             }
+        }
         }
     }
 }
@@ -136,6 +143,7 @@ if ($step === 'reset') {
 
         <?php if ($step === 'reset'): ?>
             <form method="POST" action="" class="login-form">
+                <?= csrf_field() ?>
                 <input type="hidden" name="action_reset" value="1">
                 <input type="text" class="login-input" name="code" placeholder="Code à 6 chiffres" maxlength="6" pattern="[0-9]*" inputmode="numeric" required autofocus>
                 <input type="password" class="login-input" name="nouveau_mot_de_passe" placeholder="Nouveau mot de passe" minlength="4" required>
@@ -146,6 +154,7 @@ if ($step === 'reset') {
             <a href="forgot_password.php" class="login-forgot" style="display:inline-block;margin-top:0.5rem;">Demander un nouveau code</a>
         <?php else: ?>
             <form method="POST" action="" class="login-form">
+                <?= csrf_field() ?>
                 <input type="hidden" name="action_request" value="1">
                 <input type="email" class="login-input" name="email" placeholder="Votre adresse e-mail" required autofocus>
                 <button type="submit" class="login-btn">Envoyer le code</button>

@@ -32,6 +32,9 @@ if ($action === 'delete' && $id) {
 
 // Enregistrement (ajout / modification)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === 'edit')) {
+    if (!csrf_validate()) {
+        $formError = 'Session expirée ou formulaire invalide. Veuillez réessayer.';
+    } else {
     $matricule = trim($_POST['matricule'] ?? '');
     $nom = trim($_POST['nom'] ?? '');
     $prenom = trim($_POST['prenom'] ?? '');
@@ -63,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === '
     } else {
         $formError = 'Veuillez remplir les champs obligatoires (matricule, nom, prénom, email, date d\'embauche, poste).';
     }
+    }
 }
 
 // Formulaire add/edit : charger l'employé en édition
@@ -82,13 +86,22 @@ $search = trim($_GET['q'] ?? '');
 $sort = $_GET['sort'] ?? 'date_embauche';
 $order = strtolower($_GET['order'] ?? 'desc') === 'asc' ? 'ASC' : 'DESC';
 $page = max(1, (int) ($_GET['p'] ?? 1));
-$perPage = 25;
+$maxPerPage = 100;
+$requestedPerPage = (int) ($_GET['per_page'] ?? 25);
+$perPage = min(max(1, $requestedPerPage), $maxPerPage);
 
-$allowedSort = ['date_embauche', 'nom', 'prenom', 'email', 'poste'];
-if (!in_array($sort, $allowedSort)) {
-    $sort = 'date_embauche';
-}
+// Whitelist: only these column names may be used in ORDER BY (no user input in identifier)
+$allowedOrderColumns = [
+    'date_embauche' => 'e.date_embauche',
+    'nom' => 'e.nom',
+    'prenom' => 'e.prenom',
+    'email' => 'e.email',
+    'poste' => 'e.poste',
+];
+$sort = array_key_exists($sort, $allowedOrderColumns) ? $sort : 'date_embauche';
+$orderCol = $allowedOrderColumns[$sort];
 
+// Dynamic WHERE: only fixed clause shapes + placeholders; user input goes into $params
 $where = "1=1";
 $params = [];
 if ($search !== '') {
@@ -97,7 +110,7 @@ if ($search !== '') {
     $params = array_merge($params, [$term, $term, $term, $term, $term]);
 }
 
-$countSql = "SELECT COUNT(*) FROM employes e WHERE $where";
+$countSql = "SELECT COUNT(*) FROM employes e WHERE " . $where;
 $stmt = $db->prepare($countSql);
 $stmt->execute($params);
 $total = (int) $stmt->fetchColumn();
@@ -105,14 +118,16 @@ $totalPages = max(1, (int) ceil($total / $perPage));
 $page = min($page, $totalPages);
 $offset = ($page - 1) * $perPage;
 
-$orderCol = $sort === 'date_embauche' ? 'e.date_embauche' : 'e.' . $sort;
-$sql = "SELECT e.*, d.nom as departement_nom FROM employes e LEFT JOIN departements d ON e.departement_id = d.id WHERE $where ORDER BY $orderCol $order LIMIT $perPage OFFSET $offset";
+$sql = "SELECT e.*, d.nom as departement_nom FROM employes e LEFT JOIN departements d ON e.departement_id = d.id WHERE " . $where .
+    " ORDER BY " . $orderCol . ' ' . $order .
+    " LIMIT " . (int) $perPage . " OFFSET " . (int) $offset;
 $stmt = $db->prepare($sql);
 $stmt->execute($params);
 $employes = $stmt->fetchAll();
 
 // Départements pour les formulaires
-$stmt = $db->query("SELECT id, nom FROM departements ORDER BY nom");
+$stmt = $db->prepare("SELECT id, nom FROM departements ORDER BY nom");
+$stmt->execute([]);
 $departements = $stmt->fetchAll();
 
 require_once 'includes/header-dashboard.php';
@@ -137,6 +152,7 @@ require_once 'includes/header-dashboard.php';
         <div class="card">
             <div class="card-body">
                 <form method="POST" action="">
+                    <?= csrf_field() ?>
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label">Matricule *</label>
@@ -270,7 +286,7 @@ require_once 'includes/header-dashboard.php';
                                     <?= htmlspecialchars($statutLabel[$s] ?? $s) ?>
                                 </td>
                                 <td class="employee-cell">
-                                    <span class="employee-avatar"><?= $initiales ?></span>
+                                    <span class="employee-avatar"><?= e($initiales) ?></span>
                                     <span class="employee-name"><?= htmlspecialchars($prenom . ' ' . $nom) ?></span>
                                 </td>
                                 <td><?= htmlspecialchars($emp['email'] ?? '') ?></td>

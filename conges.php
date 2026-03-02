@@ -9,6 +9,7 @@ $canEdit = hasFullAccess();
 $db = getDB();
 $action = $_GET['action'] ?? 'list';
 $id = isset($_GET['id']) ? (int) $_GET['id'] : null;
+$formError = '';
 
 if (!$canEdit && in_array($action, ['add', 'edit', 'delete', 'traiter'], true)) {
     header('Location: conges.php');
@@ -21,6 +22,9 @@ if (!$canEdit && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'add' || $action === 'edit') {
+        if (!csrf_validate()) {
+            $formError = 'Session expirée ou formulaire invalide. Veuillez réessayer.';
+        } else {
         $employe_id = (int) ($_POST['employe_id'] ?? 0);
         $type_conge = $_POST['type_conge'] ?? '';
         $date_debut = $_POST['date_debut'] ?? '';
@@ -42,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             header('Location: conges.php?success=1');
             exit();
+        }
         }
     }
 }
@@ -96,15 +101,20 @@ if ($action === 'add' || $action === 'edit') {
         }
     }
 
-    $stmt = $db->query("SELECT id, matricule, nom, prenom FROM employes WHERE statut = 'actif' ORDER BY nom, prenom");
+    $stmt = $db->prepare("SELECT id, matricule, nom, prenom FROM employes WHERE statut = 'actif' ORDER BY nom, prenom");
+    $stmt->execute([]);
     $employes = $stmt->fetchAll();
     require_once 'includes/header-dashboard.php';
     ?>
     <div class="app-page-content">
         <h1 class="h3 mb-4"><?= $action === 'add' ? 'Demander un congé' : 'Modifier un congé' ?></h1>
+        <?php if (!empty($formError)): ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($formError) ?></div>
+        <?php endif; ?>
         <div class="card">
             <div class="card-body">
                 <form method="POST" action="">
+                    <?= csrf_field() ?>
                     <div class="mb-3">
                         <label class="form-label">Employé *</label>
                         <select class="form-select" name="employe_id" required>
@@ -153,17 +163,19 @@ if ($action === 'add' || $action === 'edit') {
     exit();
 }
 
+// Dynamic WHERE: filter whitelisted, value bound via $params (no $_GET in SQL string)
 $filter = $_GET['filter'] ?? 'all';
-$where = '';
-if ($filter === 'en_attente') {
-    $where = "WHERE c.statut = 'en_attente'";
-} elseif ($filter === 'approuvé') {
-    $where = "WHERE c.statut = 'approuvé'";
-} elseif ($filter === 'refusé') {
-    $where = "WHERE c.statut = 'refusé'";
+$allowedFilters = ['en_attente', 'approuvé', 'refusé'];
+$whereSql = '';
+$params = [];
+if (in_array($filter, $allowedFilters, true)) {
+    $whereSql = "WHERE c.statut = ?";
+    $params[] = $filter;
 }
 
-$stmt = $db->query("SELECT c.*, e.matricule, e.nom, e.prenom FROM conges c JOIN employes e ON c.employe_id = e.id $where ORDER BY c.date_demande DESC");
+$sql = "SELECT c.*, e.matricule, e.nom, e.prenom FROM conges c JOIN employes e ON c.employe_id = e.id " . $whereSql . " ORDER BY c.date_demande DESC";
+$stmt = $db->prepare($sql);
+$stmt->execute($params);
 $conges = $stmt->fetchAll();
 $total = count($conges);
 
@@ -224,7 +236,7 @@ require_once 'includes/header-dashboard.php';
                             <td><?= htmlspecialchars(ucfirst(str_replace('_', ' ', $c['type_conge']))) ?></td>
                             <td><?= date('d/m/Y', strtotime($c['date_debut'])) ?> – <?= date('d/m/Y', strtotime($c['date_fin'])) ?></td>
                             <td><strong><?= (int) $c['nombre_jours'] ?></strong> jour(s)</td>
-                            <td><span class="badge app-badge-statut app-badge-<?= $statut_badge[$s] ?? 'conge-attente' ?>"><?= $statut_text[$s] ?? $s ?></span></td>
+                            <td><span class="badge app-badge-statut app-badge-<?= e($statut_badge[$s] ?? 'conge-attente') ?>"><?= e($statut_text[$s] ?? $s) ?></span></td>
                             <td><?= date('d/m/Y H:i', strtotime($c['date_demande'])) ?></td>
                             <td>
                                 <?php if ($canEdit): ?>

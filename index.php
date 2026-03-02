@@ -11,13 +11,16 @@ $db = getDB();
 
 // Stats pour les widgets
 try {
-    $stmt = $db->query("SELECT COUNT(*) as total FROM employes WHERE statut = 'actif'");
+    $stmt = $db->prepare("SELECT COUNT(*) as total FROM employes WHERE statut = 'actif'");
+    $stmt->execute([]);
     $stats['employes_actifs'] = (int) $stmt->fetch()['total'];
 
-    $stmt = $db->query("SELECT COUNT(*) as total FROM departements");
+    $stmt = $db->prepare("SELECT COUNT(*) as total FROM departements");
+    $stmt->execute([]);
     $stats['departements'] = (int) $stmt->fetch()['total'];
 
-    $stmt = $db->query("SELECT COUNT(*) as total FROM conges WHERE statut = 'en_attente'");
+    $stmt = $db->prepare("SELECT COUNT(*) as total FROM conges WHERE statut = 'en_attente'");
+    $stmt->execute([]);
     $stats['conges_attente'] = (int) $stmt->fetch()['total'];
 
     $mois_actuel = date('n');
@@ -27,22 +30,26 @@ try {
     $stats['salaires_mois'] = (int) $stmt->fetch()['total'];
 
     // Derniers employés (collaborateurs arrivés)
-    $stmt = $db->query("SELECT e.*, d.nom as departement_nom FROM employes e LEFT JOIN departements d ON e.departement_id = d.id ORDER BY e.date_embauche DESC, e.date_creation DESC LIMIT 5");
+    $stmt = $db->prepare("SELECT e.*, d.nom as departement_nom FROM employes e LEFT JOIN departements d ON e.departement_id = d.id ORDER BY e.date_embauche DESC, e.date_creation DESC LIMIT 5");
+    $stmt->execute([]);
     $derniers_employes = $stmt->fetchAll();
 
     // Congés récents
-    $stmt = $db->query("SELECT c.*, e.nom, e.prenom FROM conges c JOIN employes e ON c.employe_id = e.id ORDER BY c.date_demande DESC LIMIT 5");
+    $stmt = $db->prepare("SELECT c.*, e.nom, e.prenom FROM conges c JOIN employes e ON c.employe_id = e.id ORDER BY c.date_demande DESC LIMIT 5");
+    $stmt->execute([]);
     $conges_recents = $stmt->fetchAll();
 
     // Soldes congés par type (pour la carte Solde congé restant)
-    $stmt = $db->query("SELECT type_conge, COUNT(*) as nb FROM conges WHERE statut = 'approuvé' AND date_fin >= CURDATE() GROUP BY type_conge");
+    $stmt = $db->prepare("SELECT type_conge, COUNT(*) as nb FROM conges WHERE statut = 'approuvé' AND date_fin >= CURDATE() GROUP BY type_conge");
+    $stmt->execute([]);
     $soldes_conges = [];
     while ($row = $stmt->fetch()) {
         $soldes_conges[$row['type_conge']] = (int) $row['nb'];
     }
 
     if ($isDG) {
-        $stmt = $db->query("SELECT COUNT(*) as total FROM presences WHERE date_presence = CURDATE()");
+        $stmt = $db->prepare("SELECT COUNT(*) as total FROM presences WHERE date_presence = CURDATE()");
+        $stmt->execute([]);
         $stats['presences_aujourdhui'] = (int) $stmt->fetch()['total'];
         $stmt = $db->prepare("SELECT COALESCE(SUM(salaire_net), 0) as total FROM salaires WHERE mois = ? AND annee = ?");
         $stmt->execute([$mois_actuel, $annee_actuelle]);
@@ -162,9 +169,9 @@ $mois_fr = ['', 'janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet'
                         $ts = $emp['date_embauche'] ? strtotime($emp['date_embauche']) : time();
                     ?>
                         <a href="employes.php" class="collab-item text-decoration-none text-dark">
-                            <div class="collab-avatar"><?= strtoupper(substr($prenom, 0, 1) . substr($nom, 0, 1)) ?: '?' ?></div>
-                            <span class="collab-name"><?= htmlspecialchars($prenom) ?></span>
-                            <span class="collab-date"><?= (int)date('j', $ts) ?> <?= $mois_fr[(int)date('n', $ts)] ?? '' ?></span>
+                            <div class="collab-avatar"><?= e(strtoupper(mb_substr($prenom, 0, 1) . mb_substr($nom, 0, 1)) ?: '?') ?></div>
+                            <span class="collab-name"><?= e($prenom) ?></span>
+                            <span class="collab-date"><?= (int)date('j', $ts) ?> <?= e($mois_fr[(int)date('n', $ts)] ?? '') ?></span>
                         </a>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -181,8 +188,8 @@ $mois_fr = ['', 'janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet'
                 <ul class="alert-list">
                     <?php foreach (array_slice($conges_recents, 0, 5) as $c): ?>
                         <li>
-                            <span class="alert-badge"><?= $c['type_conge'] ?? '—' ?></span>
-                            <span class="alert-text"><?= htmlspecialchars(($c['prenom'] ?? '') . ' ' . ($c['nom'] ?? '')) ?> — <?= date('d/m/Y', strtotime($c['date_debut'] ?? 'now')) ?></span>
+                            <span class="alert-badge"><?= e($c['type_conge'] ?? '—') ?></span>
+                            <span class="alert-text"><?= e(trim(($c['prenom'] ?? '') . ' ' . ($c['nom'] ?? ''))) ?> — <?= date('d/m/Y', strtotime($c['date_debut'] ?? 'now')) ?></span>
                             <a href="conges.php" class="alert-arrow"><i class="bi bi-chevron-right"></i></a>
                         </li>
                     <?php endforeach; ?>
@@ -191,7 +198,7 @@ $mois_fr = ['', 'janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet'
         </div>
         <div class="dashboard-card">
             <h3 class="dashboard-card-title">Résumé du mois</h3>
-            <p class="text-muted small mb-1"><?= ucfirst($mois_fr[$mois_actuel] ?? '') ?> <?= $annee_actuelle ?></p>
+            <p class="text-muted small mb-1"><?= e(ucfirst($mois_fr[$mois_actuel] ?? '')) ?> <?= e((string)$annee_actuelle) ?></p>
             <p class="mb-0 small">Effectif : <strong><?= $stats['employes_actifs'] ?></strong> · Congés en attente : <strong><?= $stats['conges_attente'] ?></strong> · Fiches de paie : <strong><?= $stats['salaires_mois'] ?></strong></p>
         </div>
     </div>
@@ -326,9 +333,9 @@ $mois_fr = ['', 'janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet'
                         $ts = $emp['date_embauche'] ? strtotime($emp['date_embauche']) : time();
                     ?>
                         <a href="<?= $canEdit ? 'employes.php?action=edit&id=' . (int)$emp['id'] : 'employes.php' ?>" class="collab-item text-decoration-none text-dark">
-                            <div class="collab-avatar"><?= strtoupper(substr($prenom, 0, 1) . substr($nom, 0, 1)) ?: '?' ?></div>
-                            <span class="collab-name"><?= htmlspecialchars($prenom) ?></span>
-                            <span class="collab-date"><?= (int)date('j', $ts) ?> <?= $mois_fr[(int)date('n', $ts)] ?? '' ?></span>
+                            <div class="collab-avatar"><?= e(strtoupper(mb_substr($prenom, 0, 1) . mb_substr($nom, 0, 1)) ?: '?') ?></div>
+                            <span class="collab-name"><?= e($prenom) ?></span>
+                            <span class="collab-date"><?= (int)date('j', $ts) ?> <?= e($mois_fr[(int)date('n', $ts)] ?? '') ?></span>
                         </a>
                     <?php endforeach; ?>
                 <?php endif; ?>

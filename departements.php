@@ -21,6 +21,10 @@ if (!$canEdit && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'add' || $action === 'edit') {
+        if (!csrf_validate()) {
+            header('Location: departements.php?error=csrf');
+            exit();
+        }
         $nom = trim($_POST['nom'] ?? '');
         $description = trim($_POST['description'] ?? '');
 
@@ -64,6 +68,7 @@ if ($action === 'add' || $action === 'edit') {
         <div class="card">
             <div class="card-body">
                 <form method="POST" action="">
+                    <?= csrf_field() ?>
                     <div class="mb-3">
                         <label class="form-label">Nom du département *</label>
                         <input type="text" class="form-control" name="nom" value="<?= htmlspecialchars($departement['nom'] ?? '') ?>" required>
@@ -83,7 +88,8 @@ if ($action === 'add' || $action === 'edit') {
     exit();
 }
 
-$stmt = $db->query("SELECT d.*, COUNT(e.id) as nb_employes FROM departements d LEFT JOIN employes e ON d.id = e.departement_id GROUP BY d.id ORDER BY d.nom");
+$stmt = $db->prepare("SELECT d.*, COUNT(e.id) as nb_employes FROM departements d LEFT JOIN employes e ON d.id = e.departement_id GROUP BY d.id ORDER BY d.nom");
+$stmt->execute([]);
 $departements = $stmt->fetchAll();
 $total = count($departements);
 
@@ -93,6 +99,12 @@ require_once 'includes/header-dashboard.php';
 <?php if (isset($_GET['success'])): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         Opération effectuée avec succès.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+<?php if (isset($_GET['error']) && $_GET['error'] === 'csrf'): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Session expirée ou formulaire invalide. Veuillez réessayer.
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>

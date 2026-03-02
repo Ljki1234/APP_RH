@@ -16,6 +16,9 @@ $roles = ['admin' => 'Admin', 'rh' => 'RH', 'it' => 'IT', 'dg' => 'DG'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'add' || $action === 'edit') {
+        if (!csrf_validate()) {
+            $error = 'Session expirée ou formulaire invalide. Veuillez réessayer.';
+        } else {
         $nom_utilisateur = trim($_POST['nom_utilisateur'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $role = $_POST['role'] ?? 'rh';
@@ -53,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $error = 'Nom d\'utilisateur et email obligatoires.';
         }
+        }
     }
 }
 
@@ -87,6 +91,7 @@ if ($action === 'add' || $action === 'edit') {
         <div class="card">
             <div class="card-body">
                 <form method="POST" action="">
+                    <?= csrf_field() ?>
                     <div class="mb-3">
                         <label class="form-label">Nom d'utilisateur *</label>
                         <input type="text" class="form-control" name="nom_utilisateur" value="<?= htmlspecialchars($utilisateur['nom_utilisateur'] ?? '') ?>" required>
@@ -121,7 +126,8 @@ if ($action === 'add' || $action === 'edit') {
     exit();
 }
 
-$stmt = $db->query("SELECT id, nom_utilisateur, email, role, date_creation FROM utilisateurs ORDER BY nom_utilisateur");
+$stmt = $db->prepare("SELECT id, nom_utilisateur, email, role, date_creation FROM utilisateurs ORDER BY nom_utilisateur");
+$stmt->execute([]);
 $utilisateurs = $stmt->fetchAll();
 $total = count($utilisateurs);
 

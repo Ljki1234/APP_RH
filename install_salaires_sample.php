@@ -14,7 +14,8 @@ $mois_noms = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juille
 
 try {
     $db = getDB();
-    $stmt = $db->query("SELECT id, nom, prenom, salaire_base FROM employes WHERE statut = 'actif'");
+    $stmt = $db->prepare("SELECT id, nom, prenom, salaire_base FROM employes WHERE statut = 'actif'");
+    $stmt->execute([]);
     $employes = $stmt->fetchAll();
     if (empty($employes)) {
         echo '<h1>Aucun employé actif</h1><p>Ajoutez d\'abord des employés avec un salaire de base.</p><p><a href="login.php">Connexion</a></p>';

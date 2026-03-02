@@ -22,6 +22,10 @@ if (!$canEdit && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'add' || $action === 'edit') {
+        if (!csrf_validate()) {
+            header('Location: salaires.php?error=csrf');
+            exit();
+        }
         $employe_id = (int) ($_POST['employe_id'] ?? 0);
         $mois = (int) ($_POST['mois'] ?? 0);
         $annee = (int) ($_POST['annee'] ?? date('Y'));
@@ -69,7 +73,8 @@ if ($action === 'add' || $action === 'edit') {
         }
     }
 
-    $stmt = $db->query("SELECT id, matricule, nom, prenom, salaire_base FROM employes WHERE statut = 'actif' ORDER BY nom, prenom");
+    $stmt = $db->prepare("SELECT id, matricule, nom, prenom, salaire_base FROM employes WHERE statut = 'actif' ORDER BY nom, prenom");
+    $stmt->execute([]);
     $employes = $stmt->fetchAll();
     require_once 'includes/header-dashboard.php';
     ?>
@@ -78,6 +83,7 @@ if ($action === 'add' || $action === 'edit') {
         <div class="card">
             <div class="card-body">
                 <form method="POST" action="" id="salaireForm">
+                    <?= csrf_field() ?>
                     <div class="mb-3">
                         <label class="form-label">Employé *</label>
                         <select class="form-select" name="employe_id" id="employe_id" required>
@@ -165,7 +171,8 @@ if ($mois_filter !== null && $annee_filter !== null) {
     $stmt = $db->prepare("SELECT s.*, e.matricule, e.nom, e.prenom FROM salaires s JOIN employes e ON s.employe_id = e.id WHERE s.mois = ? AND s.annee = ? ORDER BY s.annee DESC, s.mois DESC, s.date_creation DESC");
     $stmt->execute([$mois_filter, $annee_filter]);
 } else {
-    $stmt = $db->query("SELECT s.*, e.matricule, e.nom, e.prenom FROM salaires s JOIN employes e ON s.employe_id = e.id ORDER BY s.annee DESC, s.mois DESC, s.date_creation DESC");
+    $stmt = $db->prepare("SELECT s.*, e.matricule, e.nom, e.prenom FROM salaires s JOIN employes e ON s.employe_id = e.id ORDER BY s.annee DESC, s.mois DESC, s.date_creation DESC");
+    $stmt->execute([]);
 }
 $salaires = $stmt->fetchAll();
 $total_net = array_sum(array_column($salaires, 'salaire_net'));
@@ -177,6 +184,12 @@ require_once 'includes/header-dashboard.php';
 <?php if (isset($_GET['success'])): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         Opération effectuée avec succès.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+<?php if (isset($_GET['error']) && $_GET['error'] === 'csrf'): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Session expirée ou formulaire invalide. Veuillez réessayer.
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
@@ -236,7 +249,7 @@ require_once 'includes/header-dashboard.php';
                             <td><?= number_format((float) $sal['montant_heures_sup'], 2, ',', ' ') ?> MAD</td>
                             <td><?= number_format((float) $sal['retenues'], 2, ',', ' ') ?> MAD</td>
                             <td><strong><?= number_format((float) $sal['salaire_net'], 2, ',', ' ') ?> MAD</strong></td>
-                            <td><span class="badge app-badge-statut app-badge-<?= $statut_badge[$st] ?? 'salaire-attente' ?>"><?= ucfirst($st) ?></span></td>
+                            <td><span class="badge app-badge-statut app-badge-<?= e($statut_badge[$st] ?? 'salaire-attente') ?>"><?= e(ucfirst($st)) ?></span></td>
                             <td>
                                 <?php if ($canEdit): ?>
                                 <a href="salaires.php?action=edit&id=<?= (int) $sal['id'] ?>" class="btn btn-sm btn-outline-primary" title="Modifier"><i class="bi bi-pencil"></i></a>

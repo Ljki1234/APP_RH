@@ -21,6 +21,10 @@ if (!$canEdit && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'add' || $action === 'edit') {
+        if (!csrf_validate()) {
+            header('Location: presences.php?error=csrf');
+            exit();
+        }
         $employe_id = (int) ($_POST['employe_id'] ?? 0);
         $date_presence = $_POST['date_presence'] ?? '';
         $heure_arrivee = !empty($_POST['heure_arrivee']) ? $_POST['heure_arrivee'] : null;
@@ -71,7 +75,8 @@ if ($action === 'add' || $action === 'edit') {
         }
     }
 
-    $stmt = $db->query("SELECT id, matricule, nom, prenom FROM employes WHERE statut = 'actif' ORDER BY nom, prenom");
+    $stmt = $db->prepare("SELECT id, matricule, nom, prenom FROM employes WHERE statut = 'actif' ORDER BY nom, prenom");
+    $stmt->execute([]);
     $employes = $stmt->fetchAll();
     require_once 'includes/header-dashboard.php';
     ?>
@@ -80,6 +85,7 @@ if ($action === 'add' || $action === 'edit') {
         <div class="card">
             <div class="card-body">
                 <form method="POST" action="">
+                    <?= csrf_field() ?>
                     <div class="mb-3">
                         <label class="form-label">Employé *</label>
                         <select class="form-select" name="employe_id" required>
@@ -144,6 +150,12 @@ require_once 'includes/header-dashboard.php';
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
+<?php if (isset($_GET['error']) && $_GET['error'] === 'csrf'): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Session expirée ou formulaire invalide. Veuillez réessayer.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
 
 <div class="app-page-content">
     <h1 class="h3 mb-4">Gestion des Présences</h1>
@@ -191,7 +203,7 @@ require_once 'includes/header-dashboard.php';
                             <td><?= $pres['heure_arrivee'] ? date('H:i', strtotime($pres['heure_arrivee'])) : '—' ?></td>
                             <td><?= $pres['heure_depart'] ? date('H:i', strtotime($pres['heure_depart'])) : '—' ?></td>
                             <td><?= number_format((float) $pres['heures_travaillees'], 2) ?> h</td>
-                            <td><span class="badge app-badge-statut app-badge-<?= $statut_badge[$st] ?? 'pres-ok' ?>"><?= ucfirst($st) ?></span></td>
+                            <td><span class="badge app-badge-statut app-badge-<?= e($statut_badge[$st] ?? 'pres-ok') ?>"><?= e(ucfirst($st)) ?></span></td>
                             <td><?= htmlspecialchars($pres['remarques'] ?? '') ?: '—' ?></td>
                             <td>
                                 <?php if ($canEdit): ?>

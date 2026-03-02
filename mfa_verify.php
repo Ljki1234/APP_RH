@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once 'config/auth.php';
 require_once 'config/database.php';
 
@@ -25,6 +24,9 @@ if (isset($_GET['resend']) && $_GET['resend'] === '1') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrf_validate()) {
+        $error = 'Session expirée ou formulaire invalide. Veuillez réessayer.';
+    } else {
     $code = preg_replace('/\D/', '', $_POST['code'] ?? '');
 
     if (strlen($code) !== 6) {
@@ -37,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!isset($_SESSION['mfa_code']) || $code !== $_SESSION['mfa_code']) {
         $error = 'Code incorrect.';
     } else {
+        session_regenerate_id(true);
         $_SESSION['user_id'] = $_SESSION['pending_user_id'];
         $_SESSION['nom_utilisateur'] = $_SESSION['pending_nom_utilisateur'];
         $_SESSION['email'] = $_SESSION['pending_email'];
@@ -44,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         unset($_SESSION['pending_user_id'], $_SESSION['pending_nom_utilisateur'], $_SESSION['pending_email'], $_SESSION['pending_role'], $_SESSION['mfa_code'], $_SESSION['mfa_expires']);
         header('Location: index.php');
         exit();
+    }
     }
 }
 ?>
@@ -77,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <form method="POST" action="" class="login-form">
+            <?= csrf_field() ?>
             <input type="text" class="login-input" name="code" placeholder="Code à 6 chiffres" maxlength="6" pattern="[0-9]*" inputmode="numeric" required autofocus>
             <button type="submit" class="login-btn">Valider</button>
         </form>

@@ -23,9 +23,16 @@ if (!$canEdit && $_SERVER['REQUEST_METHOD'] === 'POST') {
 // Suppression
 if ($action === 'delete' && $id) {
     try {
+        // Charger l'employé avant suppression pour l'audit
+        $oldStmt = $db->prepare("SELECT * FROM employes WHERE id = ?");
+        $oldStmt->execute([$id]);
+        $old = $oldStmt->fetch() ?: null;
+
         $stmt = $db->prepare("DELETE FROM employes WHERE id = ?");
         $stmt->execute([$id]);
-    } catch (PDOException $e) { /* ignore */ }
+        // Journaliser la suppression (même si $old est null, on trace l'action)
+        logActivity($db, 'DELETE', 'employes', $id, $old, null);
+    } catch (PDOException $e) { /* ignore, mais pas de blocage utilisateur */ }
     header('Location: employes.php?success=1');
     exit();
 }
@@ -53,10 +60,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'add' || $action === '
             if ($action === 'add') {
                 $stmt = $db->prepare("INSERT INTO employes (matricule, nom, prenom, email, telephone, adresse, date_naissance, date_embauche, poste, departement_id, salaire_base, statut) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$matricule, $nom, $prenom, $email, $telephone ?: null, $adresse ?: null, $date_naissance, $date_embauche, $poste, $departement_id, $salaire_base, $statut]);
+                // Données pour le log (nouvel employé)
+                $newData = [
+                    'matricule'      => $matricule,
+                    'nom'            => $nom,
+                    'prenom'         => $prenom,
+                    'email'          => $email,
+                    'telephone'      => $telephone ?: null,
+                    'adresse'        => $adresse ?: null,
+                    'date_naissance' => $date_naissance,
+                    'date_embauche'  => $date_embauche,
+                    'poste'          => $poste,
+                    'departement_id' => $departement_id,
+                    'salaire_base'   => $salaire_base,
+                    'statut'         => $statut,
+                ];
+                $row = $db->run('SELECT LAST_INSERT_ID() AS id')->fetch();
+                $newId = isset($row['id']) ? (int) $row['id'] : null;
+                logActivity($db, 'CREATE', 'employes', $newId, null, $newData);
                 header('Location: employes.php?success=1');
             } else {
+                // Charger l'ancien employé avant mise à jour pour l'audit
+                $oldStmt = $db->prepare("SELECT * FROM employes WHERE id = ?");
+                $oldStmt->execute([$id]);
+                $old = $oldStmt->fetch() ?: null;
+
                 $stmt = $db->prepare("UPDATE employes SET matricule=?, nom=?, prenom=?, email=?, telephone=?, adresse=?, date_naissance=?, date_embauche=?, poste=?, departement_id=?, salaire_base=?, statut=? WHERE id=?");
                 $stmt->execute([$matricule, $nom, $prenom, $email, $telephone ?: null, $adresse ?: null, $date_naissance, $date_embauche, $poste, $departement_id, $salaire_base, $statut, $id]);
+                // Nouvelles données pour le log
+                $new = [
+                    'id'             => $id,
+                    'matricule'      => $matricule,
+                    'nom'            => $nom,
+                    'prenom'         => $prenom,
+                    'email'          => $email,
+                    'telephone'      => $telephone ?: null,
+                    'adresse'        => $adresse ?: null,
+                    'date_naissance' => $date_naissance,
+                    'date_embauche'  => $date_embauche,
+                    'poste'          => $poste,
+                    'departement_id' => $departement_id,
+                    'salaire_base'   => $salaire_base,
+                    'statut'         => $statut,
+                ];
+                logActivity($db, 'UPDATE', 'employes', $id, $old, $new);
                 header('Location: employes.php?success=1');
             }
             exit();

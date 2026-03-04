@@ -196,6 +196,61 @@ body.dashboard-page {
     color: var(--hr-text);
 }
 
+/* Logs d'activité */
+.logs-card {
+    margin-top: 4px;
+}
+
+.logs-table {
+    margin-bottom: 0;
+}
+
+.logs-table tbody tr td {
+    vertical-align: top;
+}
+
+.logs-table-pill {
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    background: #f5f7fb !important;
+}
+
+.logs-diff-list {
+    max-width: 260px;
+    background: #fafbff;
+    border-radius: var(--radius-sm);
+    padding: 6px 10px;
+    border: 1px solid #eceffd;
+}
+
+.logs-diff-list li + li {
+    margin-top: 2px;
+}
+
+.logs-diff-list li strong {
+    color: var(--hr-text);
+}
+
+.logs-action-create {
+    background: #16a34a !important;
+}
+
+.logs-action-update {
+    background: #0ea5e9 !important;
+}
+
+.logs-action-delete {
+    background: #dc2626 !important;
+}
+
+/* Filtres du journal d'activité - alignés au style Employés */
+.logs-filters .logs-filter-input {
+    background: #fff;
+}
+
+.logs-filters .logs-filter-btn {
+    padding-inline: 18px;
+}
+
 /* Barre de recherche / actions */
 .employes-search-bar {
     margin-bottom: 1.5rem !important;

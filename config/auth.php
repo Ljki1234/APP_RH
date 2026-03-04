@@ -146,6 +146,48 @@ function logLoginAudit($db, $identifier, $emailAttempted, $event) {
 }
 
 /**
+ * Generic activity audit log.
+ * Requires table: activity_logs (see SQL install script).
+ * Uses SafeDB wrapper (run method) and never updates/deletes logs (append-only).
+ *
+ * @param SafeDB     $db
+ * @param string     $action     e.g. CREATE, READ, UPDATE, DELETE, LOGIN, LOGOUT, FAILED_LOGIN, ROLE_CHANGE, PASSWORD_CHANGE
+ * @param string|null $tableName Name of the affected table (null for generic events such as LOGIN)
+ * @param int|null    $recordId  Primary key of the affected record, if applicable
+ * @param array|null  $oldData   Previous values (associative array), encoded as JSON
+ * @param array|null  $newData   New values (associative array), encoded as JSON
+ */
+function logActivity($db, string $action, ?string $tableName = null, ?int $recordId = null, ?array $oldData = null, ?array $newData = null) {
+    // Best-effort: never throw in normal flow
+    try {
+        $userId = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+        $userAgent = substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255);
+
+        $oldJson = $oldData !== null ? json_encode($oldData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null;
+        $newJson = $newData !== null ? json_encode($newData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : null;
+
+        $db->run(
+            'INSERT INTO activity_logs (user_id, action, table_name, record_id, old_value, new_value, ip_address, user_agent) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+                $userId,
+                $action,
+                $tableName,
+                $recordId,
+                $oldJson,
+                $newJson,
+                $ip,
+                $userAgent
+            ]
+        );
+    } catch (Throwable $e) {
+        // Do not break main flow if logging fails; only log to PHP error log.
+        error_log('[Gestion RH] logActivity error: ' . $e->getMessage());
+    }
+}
+
+/**
  * Enforce session timeout for authenticated or pre-auth (MFA) sessions.
  * Redirects to login with ?timeout=1 if inactive too long.
  */

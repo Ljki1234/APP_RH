@@ -44,6 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['nom_utilisateur'] = $_SESSION['pending_nom_utilisateur'];
         $_SESSION['email'] = $_SESSION['pending_email'];
         $_SESSION['role'] = $_SESSION['pending_role'];
+
+        // Audit: successful login (after MFA)
+        $db = getDB();
+        logActivity($db, 'LOGIN', null, null, null, ['email' => $_SESSION['email'] ?? null]);
+
         unset($_SESSION['pending_user_id'], $_SESSION['pending_nom_utilisateur'], $_SESSION['pending_email'], $_SESSION['pending_role'], $_SESSION['mfa_code'], $_SESSION['mfa_expires']);
         header('Location: index.php');
         exit();

@@ -40,9 +40,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($action === 'add') {
                 $stmt = $db->prepare("INSERT INTO conges (employe_id, type_conge, date_debut, date_fin, nombre_jours, motif) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$employe_id, $type_conge, $date_debut, $date_fin, $nombre_jours, $motif ?: null]);
+                // Audit: création d'un congé (statut par défaut en_attente)
+                $newData = [
+                    'employe_id'   => $employe_id,
+                    'type_conge'   => $type_conge,
+                    'date_debut'   => $date_debut,
+                    'date_fin'     => $date_fin,
+                    'nombre_jours' => $nombre_jours,
+                    'motif'        => $motif ?: null,
+                    'statut'       => 'en_attente',
+                ];
+                $row = $db->run('SELECT LAST_INSERT_ID() AS id')->fetch();
+                $newId = isset($row['id']) ? (int) $row['id'] : null;
+                logActivity($db, 'CREATE', 'conges', $newId, null, $newData);
             } else {
+                // Charger l'ancien congé avant mise à jour
+                $oldStmt = $db->prepare("SELECT * FROM conges WHERE id = ?");
+                $oldStmt->execute([$id]);
+                $old = $oldStmt->fetch() ?: null;
+
                 $stmt = $db->prepare("UPDATE conges SET employe_id=?, type_conge=?, date_debut=?, date_fin=?, nombre_jours=?, motif=? WHERE id=?");
                 $stmt->execute([$employe_id, $type_conge, $date_debut, $date_fin, $nombre_jours, $motif ?: null, $id]);
+                $new = [
+                    'id'           => $id,
+                    'employe_id'   => $employe_id,
+                    'type_conge'   => $type_conge,
+                    'date_debut'   => $date_debut,
+                    'date_fin'     => $date_fin,
+                    'nombre_jours' => $nombre_jours,
+                    'motif'        => $motif ?: null,
+                    'statut'       => $old['statut'] ?? 'en_attente',
+                ];
+                logActivity($db, 'UPDATE', 'conges', $id, $old, $new);
             }
             header('Location: conges.php?success=1');
             exit();
@@ -56,10 +85,17 @@ if ($action === 'traiter' && $id) {
     if (in_array($statut, ['approuvé', 'refusé'])) {
         $stmt = $db->prepare("SELECT c.*, e.email as employe_email, e.prenom, e.nom FROM conges c JOIN employes e ON c.employe_id = e.id WHERE c.id = ?");
         $stmt->execute([$id]);
-        $conge = $stmt->fetch();
+        $conge = $stmt->fetch(); // ancien état
         $user_id = $_SESSION['user_id'] ?? null;
         $stmt = $db->prepare("UPDATE conges SET statut=?, date_traitement=NOW(), traite_par=? WHERE id=?");
         $stmt->execute([$statut, $user_id, $id]);
+
+        // Audit: changement de statut du congé
+        $new = $conge ?: [];
+        $new['statut'] = $statut;
+        $new['traite_par'] = $user_id;
+        $new['date_traitement'] = date('Y-m-d H:i:s');
+        logActivity($db, 'UPDATE', 'conges', $id, $conge, $new);
 
         if ($conge && !empty($conge['employe_email'])) {
             require_once __DIR__ . '/config/mail.php';
@@ -83,8 +119,14 @@ if ($action === 'traiter' && $id) {
 }
 
 if ($action === 'delete' && $id) {
+    // Charger l'ancien congé avant suppression
+    $oldStmt = $db->prepare("SELECT * FROM conges WHERE id = ?");
+    $oldStmt->execute([$id]);
+    $old = $oldStmt->fetch() ?: null;
+
     $stmt = $db->prepare("DELETE FROM conges WHERE id = ?");
     $stmt->execute([$id]);
+    logActivity($db, 'DELETE', 'conges', $id, $old, null);
     header('Location: conges.php?success=1');
     exit();
 }

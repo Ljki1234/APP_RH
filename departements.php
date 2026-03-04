@@ -32,10 +32,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($action === 'add') {
                 $stmt = $db->prepare("INSERT INTO departements (nom, description) VALUES (?, ?)");
                 $stmt->execute([$nom, $description ?: null]);
+                $newData = ['nom' => $nom, 'description' => $description ?: null];
+                logActivity($db, 'CREATE', 'departements', (int)$db->run('SELECT LAST_INSERT_ID() AS id')->fetch()['id'], null, $newData);
                 header('Location: departements.php?success=1');
             } else {
+                // Load old data before update for audit trail
+                $oldStmt = $db->prepare("SELECT * FROM departements WHERE id = ?");
+                $oldStmt->execute([$id]);
+                $old = $oldStmt->fetch() ?: null;
+
                 $stmt = $db->prepare("UPDATE departements SET nom=?, description=? WHERE id=?");
                 $stmt->execute([$nom, $description ?: null, $id]);
+                $new = ['id' => $id, 'nom' => $nom, 'description' => $description ?: null];
+                logActivity($db, 'UPDATE', 'departements', $id, $old, $new);
                 header('Location: departements.php?success=1');
             }
             exit();
@@ -44,8 +53,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'delete' && $id) {
+    // Load before delete
+    $oldStmt = $db->prepare("SELECT * FROM departements WHERE id = ?");
+    $oldStmt->execute([$id]);
+    $old = $oldStmt->fetch() ?: null;
+
     $stmt = $db->prepare("DELETE FROM departements WHERE id = ?");
     $stmt->execute([$id]);
+    logActivity($db, 'DELETE', 'departements', $id, $old, null);
     header('Location: departements.php?success=1');
     exit();
 }

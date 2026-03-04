@@ -43,9 +43,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($action === 'add') {
                     $stmt = $db->prepare("INSERT INTO salaires (employe_id, mois, annee, salaire_base, prime, heures_supplementaires, montant_heures_sup, retenues, salaire_net, date_paiement, statut) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     $stmt->execute([$employe_id, $mois, $annee, $salaire_base, $prime, $heures_supplementaires, $montant_heures_sup, $retenues, $salaire_net, $date_paiement, $statut]);
+                    // Audit: création d'un salaire
+                    $newData = [
+                        'employe_id'            => $employe_id,
+                        'mois'                  => $mois,
+                        'annee'                 => $annee,
+                        'salaire_base'          => $salaire_base,
+                        'prime'                 => $prime,
+                        'heures_supplementaires'=> $heures_supplementaires,
+                        'montant_heures_sup'    => $montant_heures_sup,
+                        'retenues'              => $retenues,
+                        'salaire_net'           => $salaire_net,
+                        'date_paiement'         => $date_paiement,
+                        'statut'                => $statut,
+                    ];
+                    $row = $db->run('SELECT LAST_INSERT_ID() AS id')->fetch();
+                    $newId = isset($row['id']) ? (int) $row['id'] : null;
+                    logActivity($db, 'CREATE', 'salaires', $newId, null, $newData);
                 } else {
+                    // Charger l'ancien salaire avant mise à jour
+                    $oldStmt = $db->prepare("SELECT * FROM salaires WHERE id = ?");
+                    $oldStmt->execute([$id]);
+                    $old = $oldStmt->fetch() ?: null;
+
                     $stmt = $db->prepare("UPDATE salaires SET employe_id=?, mois=?, annee=?, salaire_base=?, prime=?, heures_supplementaires=?, montant_heures_sup=?, retenues=?, salaire_net=?, date_paiement=?, statut=? WHERE id=?");
                     $stmt->execute([$employe_id, $mois, $annee, $salaire_base, $prime, $heures_supplementaires, $montant_heures_sup, $retenues, $salaire_net, $date_paiement, $statut, $id]);
+                    // Audit: mise à jour de salaire
+                    $new = [
+                        'id'                    => $id,
+                        'employe_id'            => $employe_id,
+                        'mois'                  => $mois,
+                        'annee'                 => $annee,
+                        'salaire_base'          => $salaire_base,
+                        'prime'                 => $prime,
+                        'heures_supplementaires'=> $heures_supplementaires,
+                        'montant_heures_sup'    => $montant_heures_sup,
+                        'retenues'              => $retenues,
+                        'salaire_net'           => $salaire_net,
+                        'date_paiement'         => $date_paiement,
+                        'statut'                => $statut,
+                    ];
+                    logActivity($db, 'UPDATE', 'salaires', $id, $old, $new);
                 }
                 header('Location: salaires.php?success=1');
                 exit();
@@ -55,8 +93,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'delete' && $id) {
+    // Charger l'ancien salaire avant suppression
+    $oldStmt = $db->prepare("SELECT * FROM salaires WHERE id = ?");
+    $oldStmt->execute([$id]);
+    $old = $oldStmt->fetch() ?: null;
+
     $stmt = $db->prepare("DELETE FROM salaires WHERE id = ?");
     $stmt->execute([$id]);
+    logActivity($db, 'DELETE', 'salaires', $id, $old, null);
     header('Location: salaires.php?success=1');
     exit();
 }

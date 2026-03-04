@@ -76,6 +76,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $corps = '<p>Bonjour ' . htmlspecialchars($user['nom_utilisateur']) . ',</p><p>Votre code de vérification pour vous connecter est : <strong>' . $mfaCode . '</strong></p><p>Ce code est valable 10 minutes. Ne le partagez avec personne.</p><p>Cordialement,<br>Gestion RH</p>';
                 sendMail($user['email'], $sujet, $corps);
 
+                // Audit: login challenge initiated (MFA step)
+                logActivity($db, 'LOGIN_CHALLENGE', null, null, null, ['email' => $user['email']]);
+
                 header('Location: mfa_verify.php');
                 exit();
             }
@@ -83,6 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         recordFailedLogin($db, $clientId, $email);
         logLoginAudit($db, $clientId, $email, 'failed');
+        logActivity($db, 'FAILED_LOGIN', null, null, null, ['email' => $email]);
         $error = 'Adresse e-mail ou mot de passe incorrect';
     } else {
         $error = 'Veuillez remplir tous les champs';

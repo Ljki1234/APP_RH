@@ -79,14 +79,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    const deleteButtons = document.querySelectorAll('a[href*="action=delete"]');
-    deleteButtons.forEach(function(button) {
-        if (!button.onclick) {
+    // Modal de confirmation de suppression (global)
+    const deleteButtons = document.querySelectorAll(
+        'a[href*="action=delete"], a[href*="do=delete"], a.js-confirm-delete'
+    );
+    const confirmModalEl = document.getElementById('confirmDeleteModal');
+    const confirmMessageEl = document.getElementById('confirmDeleteMessage');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    let targetDeleteHref = null;
+
+    if (confirmModalEl && confirmMessageEl && confirmBtn && deleteButtons.length > 0) {
+        const bsConfirmModal = new bootstrap.Modal(confirmModalEl);
+
+        deleteButtons.forEach(function(button) {
             button.addEventListener('click', function(e) {
-                if (!confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
-                    e.preventDefault();
-                }
+                e.preventDefault();
+                const message = button.getAttribute('data-confirm')
+                    || 'Êtes-vous sûr de vouloir supprimer cet élément ?';
+                confirmMessageEl.textContent = message;
+                targetDeleteHref = button.getAttribute('href');
+                bsConfirmModal.show();
             });
-        }
-    });
+        });
+
+        confirmBtn.addEventListener('click', function() {
+            if (targetDeleteHref) {
+                window.location.href = targetDeleteHref;
+            }
+        });
+    }
 });

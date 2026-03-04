@@ -16,7 +16,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="assets/css/theme-advanced.css">
 </head>
-<body class="dashboard-page <?= in_array($currentPage, ['employes.php', 'departements.php', 'conges.php', 'salaires.php', 'presences.php', 'utilisateurs.php']) ? 'app-page' : '' ?> <?= $currentPage === 'employes.php' ? 'page-employes' : '' ?> <?= $currentPage === 'departements.php' ? 'page-departements' : '' ?> <?= $currentPage === 'conges.php' ? 'page-conges' : '' ?> <?= $currentPage === 'salaires.php' ? 'page-salaires' : '' ?> <?= $currentPage === 'presences.php' ? 'page-presences' : '' ?> <?= $currentPage === 'utilisateurs.php' ? 'page-utilisateurs' : '' ?> <?= !empty($hideRightSidebar) ? 'no-right-sidebar' : '' ?>">
+<body class="dashboard-page <?= in_array($currentPage, ['employes.php', 'departements.php', 'conges.php', 'salaires.php', 'presences.php', 'utilisateurs.php', 'activity_logs.php']) ? 'app-page' : '' ?> <?= $currentPage === 'employes.php' ? 'page-employes' : '' ?> <?= $currentPage === 'departements.php' ? 'page-departements' : '' ?> <?= $currentPage === 'conges.php' ? 'page-conges' : '' ?> <?= $currentPage === 'salaires.php' ? 'page-salaires' : '' ?> <?= $currentPage === 'presences.php' ? 'page-presences' : '' ?> <?= $currentPage === 'utilisateurs.php' ? 'page-utilisateurs' : '' ?> <?= $currentPage === 'activity_logs.php' ? 'page-activity-logs' : '' ?> <?= !empty($hideRightSidebar) ? 'no-right-sidebar' : '' ?>">
 <div class="dashboard-layout <?= !empty($hideRightSidebar) ? 'no-right-sidebar' : '' ?>">
     <aside class="dashboard-sidebar-left">
         <div class="dashboard-logo">HR MAPS</div>
@@ -27,7 +27,10 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             <a href="conges.php" class="<?= $currentPage === 'conges.php' ? 'active' : '' ?>" title="Congés"><i class="bi bi-calendar-check"></i></a>
             <a href="salaires.php" class="<?= $currentPage === 'salaires.php' ? 'active' : '' ?>" title="Salaires"><i class="bi bi-cash-coin"></i></a>
             <a href="presences.php" class="<?= $currentPage === 'presences.php' ? 'active' : '' ?>" title="Présences"><i class="bi bi-clock-history"></i></a>
-            <?php if (canManageUsers()): ?><a href="utilisateurs.php" class="<?= $currentPage === 'utilisateurs.php' ? 'active' : '' ?>" title="Utilisateurs"><i class="bi bi-person-gear"></i></a><?php endif; ?>
+            <?php if (canManageUsers()): ?>
+                <a href="utilisateurs.php" class="<?= $currentPage === 'utilisateurs.php' ? 'active' : '' ?>" title="Utilisateurs"><i class="bi bi-person-gear"></i></a>
+                <a href="activity_logs.php" class="<?= $currentPage === 'activity_logs.php' ? 'active' : '' ?>" title="Journal d'activité"><i class="bi bi-activity"></i></a>
+            <?php endif; ?>
             <a href="logout.php" class="dashboard-nav-logout" title="Déconnexion"><i class="bi bi-box-arrow-right"></i></a>
         </nav>
     </aside>

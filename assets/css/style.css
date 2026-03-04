@@ -219,6 +219,26 @@ body.page-conges .btn-success:hover {
     color: #bb2d3b;
 }
 
+/* Filtres Journal d'activité : inspirés des congés */
+.page-activity-logs .logs-filter-group {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(13, 202, 240, 0.25);
+}
+.page-activity-logs .logs-filter-group .btn {
+    border-radius: 0;
+    border: none;
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 0.45rem 1rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+.page-activity-logs .logs-filter-group .btn:last-child {
+    border-right: none;
+}
+
 /* Page Salaires : mêmes couleurs que Employés / Départements / Congés */
 .page-salaires .btn-primary,
 .page-salaires a.btn-primary {

@@ -45,9 +45,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($action === 'add') {
                     $stmt = $db->prepare("INSERT INTO presences (employe_id, date_presence, heure_arrivee, heure_depart, heures_travaillees, statut, remarques) VALUES (?, ?, ?, ?, ?, ?, ?)");
                     $stmt->execute([$employe_id, $date_presence, $heure_arrivee, $heure_depart, $heures_travaillees, $statut, $remarques ?: null]);
+                    // Audit: création de présence
+                    $newData = [
+                        'employe_id'        => $employe_id,
+                        'date_presence'     => $date_presence,
+                        'heure_arrivee'     => $heure_arrivee,
+                        'heure_depart'      => $heure_depart,
+                        'heures_travaillees'=> $heures_travaillees,
+                        'statut'            => $statut,
+                        'remarques'         => $remarques ?: null,
+                    ];
+                    $row = $db->run('SELECT LAST_INSERT_ID() AS id')->fetch();
+                    $newId = isset($row['id']) ? (int) $row['id'] : null;
+                    logActivity($db, 'CREATE', 'presences', $newId, null, $newData);
                 } else {
+                    // Charger l'ancienne présence avant mise à jour
+                    $oldStmt = $db->prepare("SELECT * FROM presences WHERE id = ?");
+                    $oldStmt->execute([$id]);
+                    $old = $oldStmt->fetch() ?: null;
+
                     $stmt = $db->prepare("UPDATE presences SET employe_id=?, date_presence=?, heure_arrivee=?, heure_depart=?, heures_travaillees=?, statut=?, remarques=? WHERE id=?");
                     $stmt->execute([$employe_id, $date_presence, $heure_arrivee, $heure_depart, $heures_travaillees, $statut, $remarques ?: null, $id]);
+                    $new = [
+                        'id'                => $id,
+                        'employe_id'        => $employe_id,
+                        'date_presence'     => $date_presence,
+                        'heure_arrivee'     => $heure_arrivee,
+                        'heure_depart'      => $heure_depart,
+                        'heures_travaillees'=> $heures_travaillees,
+                        'statut'            => $statut,
+                        'remarques'         => $remarques ?: null,
+                    ];
+                    logActivity($db, 'UPDATE', 'presences', $id, $old, $new);
                 }
                 header('Location: presences.php?success=1');
                 exit();
@@ -57,8 +86,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'delete' && $id) {
+    // Charger l'ancienne présence avant suppression
+    $oldStmt = $db->prepare("SELECT * FROM presences WHERE id = ?");
+    $oldStmt->execute([$id]);
+    $old = $oldStmt->fetch() ?: null;
+
     $stmt = $db->prepare("DELETE FROM presences WHERE id = ?");
     $stmt->execute([$id]);
+    logActivity($db, 'DELETE', 'presences', $id, $old, null);
     header('Location: presences.php?success=1');
     exit();
 }

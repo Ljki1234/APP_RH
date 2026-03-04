@@ -34,17 +34,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $hash = password_hash($mot_de_passe, PASSWORD_DEFAULT);
                         $stmt = $db->prepare("INSERT INTO utilisateurs (nom_utilisateur, email, mot_de_passe, role) VALUES (?, ?, ?, ?)");
                         $stmt->execute([$nom_utilisateur, $email, $hash, $role]);
+                        // Audit: création d'utilisateur (sans mot de passe en clair)
+                        $newData = [
+                            'nom_utilisateur' => $nom_utilisateur,
+                            'email'           => $email,
+                            'role'            => $role,
+                            'password_set'    => true,
+                        ];
+                        $row = $db->run('SELECT LAST_INSERT_ID() AS id')->fetch();
+                        $newId = isset($row['id']) ? (int) $row['id'] : null;
+                        logActivity($db, 'CREATE', 'utilisateurs', $newId, null, $newData);
                         header('Location: utilisateurs.php?success=1');
                         exit();
                     }
                 } else {
+                    // Charger l'ancien utilisateur avant mise à jour
+                    $oldStmt = $db->prepare("SELECT * FROM utilisateurs WHERE id = ?");
+                    $oldStmt->execute([$id]);
+                    $old = $oldStmt->fetch() ?: null;
+
                     $stmt = $db->prepare("UPDATE utilisateurs SET nom_utilisateur=?, email=?, role=? WHERE id=?");
                     $stmt->execute([$nom_utilisateur, $email, $role, $id]);
                     $mot_de_passe = trim($_POST['mot_de_passe'] ?? '');
+                    // Audit: changement de rôle éventuel
+                    if ($old) {
+                        $newUserData = $old;
+                        $newUserData['nom_utilisateur'] = $nom_utilisateur;
+                        $newUserData['email'] = $email;
+                        $newUserData['role'] = $role;
+                        logActivity($db, 'UPDATE', 'utilisateurs', $id, $old, $newUserData);
+                        if ($old['role'] !== $role) {
+                            logActivity($db, 'ROLE_CHANGE', 'utilisateurs', $id, ['role' => $old['role']], ['role' => $role]);
+                        }
+                    }
                     if ($mot_de_passe !== '') {
                         $hash = password_hash($mot_de_passe, PASSWORD_DEFAULT);
                         $up = $db->prepare("UPDATE utilisateurs SET mot_de_passe=? WHERE id=?");
                         $up->execute([$hash, $id]);
+                        // Audit: changement de mot de passe (sans log du mot de passe)
+                        logActivity($db, 'PASSWORD_CHANGE', 'utilisateurs', $id, null, ['password_changed' => true]);
                     }
                     header('Location: utilisateurs.php?success=1');
                     exit();
@@ -63,8 +91,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($action === 'delete' && $id) {
     $current_id = $_SESSION['user_id'] ?? 0;
     if ((int) $id !== (int) $current_id) {
+        // Charger l'utilisateur avant suppression
+        $oldStmt = $db->prepare("SELECT * FROM utilisateurs WHERE id = ?");
+        $oldStmt->execute([$id]);
+        $old = $oldStmt->fetch() ?: null;
+
         $stmt = $db->prepare("DELETE FROM utilisateurs WHERE id = ?");
         $stmt->execute([$id]);
+        logActivity($db, 'DELETE', 'utilisateurs', $id, $old, null);
     }
     header('Location: utilisateurs.php?success=1');
     exit();
